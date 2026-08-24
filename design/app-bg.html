@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<style>
+body{margin:0;background:#e9e7e2;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+.dv-turn{padding:44px 48px 36px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 26px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a2b28;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.3 system-ui,sans-serif;color:#1a2b28}
+.dv-opts{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:12px;scroll-margin-top:16px}
+.dv-olabel{display:flex;align-items:baseline;gap:9px;font:400 11.5px/1.4 system-ui,sans-serif;color:rgba(0,0,0,.5);max-width:340px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a2b28;border-radius:5px;text-decoration:none}
+.dv-opt:target .dv-oid{background:#2f9e97;color:#fff}
+.dv-next{margin:26px 0 0;font:12px/1.6 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+.dv-next a{color:#2f9e97;text-decoration:none;font-weight:600}
+@keyframes driftA{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(5px,-9px) rotate(1.5deg)}}
+@keyframes driftB{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(-6px,7px) rotate(-1.5deg)}}
+@keyframes tw{0%,100%{opacity:.4;transform:scale(.85)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes spk{0%,100%{opacity:.15;transform:scale(.5) rotate(0deg)}50%{opacity:1;transform:scale(1.1) rotate(45deg)}}
+@keyframes plusTw{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:.9;transform:scale(1.05)}}
+@keyframes pulse{0%{transform:translate(-50%,-50%) scale(.5);opacity:.45}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0}}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Open spacing (<a class="dv-oid" href="#1b">1b</a>) + full gem set (<a class="dv-oid" href="#1a">1a</a>) · light &amp; dark</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="2a">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Light — airy petals, open center, gems &amp; sparkles ringing the edges</div>
+<div class="dv-card" style="width:340px;height:720px;border-radius:46px;overflow:hidden;position:relative;background:linear-gradient(170deg,#fbfdfc 0%,#f1f7f4 60%,#e9f2ef 100%);box-shadow:0 22px 55px rgba(60,90,85,.2),0 2px 8px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.7)">
+  <sc-for list="{{ v4.leaves }}" as="leaf" hint-placeholder-count="3">
+    <div style="position:absolute;width:170px;height:170px;left:{{leaf.left}};top:{{leaf.top}};transform:{{leaf.otransform}};opacity:{{leaf.opacity}};filter:{{leaf.filter}}">
+      <div style="position:absolute;inset:0;animation:{{leaf.anim}}">
+        <sc-for list="{{ petals }}" as="p" hint-placeholder-count="4">
+          <div style="position:absolute;left:50%;bottom:50%;width:46px;height:96px;margin-left:-23px;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;background:linear-gradient(160deg,rgba(206,227,222,.85),rgba(158,196,189,.5));transform-origin:50% 100%;transform:{{p.transform}};box-shadow:inset 0 0 12px rgba(255,255,255,.4)">
+            <div style="position:absolute;left:50%;top:9%;width:2px;height:78%;margin-left:-1px;background:linear-gradient(rgba(140,175,168,.5),rgba(140,175,168,0));border-radius:2px"></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v4.gems }}" as="gem" hint-placeholder-count="9">
+    <div style="position:absolute;left:{{gem.left}};top:{{gem.top}};width:{{gem.size}};height:{{gem.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{gem.anim}}">
+        <div style="position:absolute;inset:0;border-radius:3px;transform:rotate(45deg);background:{{gem.grad}};box-shadow:{{gem.shadow}},inset 0 0 6px rgba(255,255,255,.7)">
+          <div style="position:absolute;left:20%;top:18%;width:28%;height:28%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),transparent 70%)"></div>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v4.sparkles }}" as="s" hint-placeholder-count="10">
+    <div style="position:absolute;left:{{s.left}};top:{{s.top}};width:{{s.size}};height:{{s.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{s.anim}}">
+        <div style="position:absolute;left:50%;top:0;width:2px;height:100%;margin-left:-1px;background:linear-gradient(transparent,rgba(255,255,255,.95) 50%,transparent);border-radius:2px"></div>
+        <div style="position:absolute;top:50%;left:0;height:2px;width:100%;margin-top:-1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95) 50%,transparent);border-radius:2px"></div>
+        <div style="position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:#fff;box-shadow:0 0 6px 2px rgba(255,255,255,.8)"></div>
+      </div>
+    </div>
+  </sc-for>
+  <div style="position:absolute;top:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 30px;font:600 15px system-ui;color:rgba(50,84,78,.7)"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="width:17px;height:10px;border-radius:2px;background:rgba(50,84,78,.55)"></div><div style="width:22px;height:11px;border:1.5px solid rgba(50,84,78,.5);border-radius:3px"></div></div></div>
+  <div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:3px;background:rgba(50,84,78,.32)"></div>
+</div>
+</div>
+
+<div class="dv-opt" id="2b">
+<div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Dark mode — deep clinical night, glowing teal gems, faint petals</div>
+<div class="dv-card" style="width:340px;height:720px;border-radius:46px;overflow:hidden;position:relative;background:radial-gradient(125% 95% at 50% 34%,#12312e 0%,#0d2523 55%,#081a19 100%);box-shadow:0 22px 55px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);border:1px solid rgba(120,180,172,.14)">
+  <sc-for list="{{ v5.leaves }}" as="leaf" hint-placeholder-count="3">
+    <div style="position:absolute;width:170px;height:170px;left:{{leaf.left}};top:{{leaf.top}};transform:{{leaf.otransform}};opacity:{{leaf.opacity}};filter:{{leaf.filter}}">
+      <div style="position:absolute;inset:0;animation:{{leaf.anim}}">
+        <sc-for list="{{ petals }}" as="p" hint-placeholder-count="4">
+          <div style="position:absolute;left:50%;bottom:50%;width:46px;height:96px;margin-left:-23px;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;background:linear-gradient(160deg,rgba(120,180,172,.5),rgba(70,120,114,.22));transform-origin:50% 100%;transform:{{p.transform}};box-shadow:inset 0 0 12px rgba(150,210,200,.18)">
+            <div style="position:absolute;left:50%;top:9%;width:2px;height:78%;margin-left:-1px;background:linear-gradient(rgba(160,215,205,.4),rgba(160,215,205,0));border-radius:2px"></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v5.gems }}" as="gem" hint-placeholder-count="9">
+    <div style="position:absolute;left:{{gem.left}};top:{{gem.top}};width:{{gem.size}};height:{{gem.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{gem.anim}}">
+        <div style="position:absolute;inset:0;border-radius:3px;transform:rotate(45deg);background:{{gem.grad}};box-shadow:{{gem.shadow}},inset 0 0 6px rgba(255,255,255,.7)">
+          <div style="position:absolute;left:20%;top:18%;width:28%;height:28%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),transparent 70%)"></div>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v5.sparkles }}" as="s" hint-placeholder-count="10">
+    <div style="position:absolute;left:{{s.left}};top:{{s.top}};width:{{s.size}};height:{{s.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{s.anim}}">
+        <div style="position:absolute;left:50%;top:0;width:2px;height:100%;margin-left:-1px;background:linear-gradient(transparent,rgba(190,240,232,.95) 50%,transparent);border-radius:2px"></div>
+        <div style="position:absolute;top:50%;left:0;height:2px;width:100%;margin-top:-1px;background:linear-gradient(90deg,transparent,rgba(190,240,232,.95) 50%,transparent);border-radius:2px"></div>
+        <div style="position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:#eafffb;box-shadow:0 0 7px 2px rgba(150,230,218,.85)"></div>
+      </div>
+    </div>
+  </sc-for>
+  <div style="position:absolute;top:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 30px;font:600 15px system-ui;color:rgba(190,225,218,.8)"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="width:17px;height:10px;border-radius:2px;background:rgba(190,225,218,.6)"></div><div style="width:22px;height:11px;border:1.5px solid rgba(190,225,218,.55);border-radius:3px"></div></div></div>
+  <div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:3px;background:rgba(190,225,218,.4)"></div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "add more gems near the top of <a class="dv-oid" href="#2b">2b</a>" · "warm the dark mode toward navy" · "show <a class="dv-oid" href="#2a">2a</a> with a login card on top"</p>
+</section>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Mobile app backgrounds · frosted mint / gem motif · subtle motion</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Faithful — corner petal clusters, scattered gems &amp; star sparkles, slow drift + twinkle</div>
+<div class="dv-card" style="width:340px;height:720px;border-radius:46px;overflow:hidden;position:relative;background:radial-gradient(125% 90% at 50% 38%,#ffffff 0%,#f3f8f6 52%,#e6f0ed 100%);box-shadow:0 22px 55px rgba(60,90,85,.2),0 2px 8px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.7)">
+  <sc-for list="{{ v1.leaves }}" as="leaf" hint-placeholder-count="6">
+    <div style="position:absolute;width:170px;height:170px;left:{{leaf.left}};top:{{leaf.top}};transform:{{leaf.otransform}};opacity:{{leaf.opacity}};filter:{{leaf.filter}}">
+      <div style="position:absolute;inset:0;animation:{{leaf.anim}}">
+        <sc-for list="{{ petals }}" as="p" hint-placeholder-count="4">
+          <div style="position:absolute;left:50%;bottom:50%;width:46px;height:96px;margin-left:-23px;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;background:linear-gradient(160deg,rgba(206,227,222,.85),rgba(158,196,189,.5));transform-origin:50% 100%;transform:{{p.transform}};box-shadow:inset 0 0 12px rgba(255,255,255,.4)">
+            <div style="position:absolute;left:50%;top:9%;width:2px;height:78%;margin-left:-1px;background:linear-gradient(rgba(140,175,168,.5),rgba(140,175,168,0));border-radius:2px"></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v1.gems }}" as="gem" hint-placeholder-count="9">
+    <div style="position:absolute;left:{{gem.left}};top:{{gem.top}};width:{{gem.size}};height:{{gem.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{gem.anim}}">
+        <div style="position:absolute;inset:0;border-radius:3px;transform:rotate(45deg);background:{{gem.grad}};box-shadow:{{gem.shadow}},inset 0 0 6px rgba(255,255,255,.7)">
+          <div style="position:absolute;left:20%;top:18%;width:28%;height:28%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),transparent 70%)"></div>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v1.sparkles }}" as="s" hint-placeholder-count="10">
+    <div style="position:absolute;left:{{s.left}};top:{{s.top}};width:{{s.size}};height:{{s.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{s.anim}}">
+        <div style="position:absolute;left:50%;top:0;width:2px;height:100%;margin-left:-1px;background:linear-gradient(transparent,rgba(255,255,255,.95) 50%,transparent);border-radius:2px"></div>
+        <div style="position:absolute;top:50%;left:0;height:2px;width:100%;margin-top:-1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95) 50%,transparent);border-radius:2px"></div>
+        <div style="position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:#fff;box-shadow:0 0 6px 2px rgba(255,255,255,.8)"></div>
+      </div>
+    </div>
+  </sc-for>
+  <div style="position:absolute;top:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 30px;font:600 15px system-ui;color:rgba(50,84,78,.7)"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="width:17px;height:10px;border-radius:2px;background:rgba(50,84,78,.55)"></div><div style="width:22px;height:11px;border:1.5px solid rgba(50,84,78,.5);border-radius:3px"></div></div></div>
+  <div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:3px;background:rgba(50,84,78,.32)"></div>
+</div>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Minimal calm — two oversized soft petals, lots of breathing room, barely-there motion</div>
+<div class="dv-card" style="width:340px;height:720px;border-radius:46px;overflow:hidden;position:relative;background:linear-gradient(170deg,#fbfdfc 0%,#f1f7f4 60%,#e9f2ef 100%);box-shadow:0 22px 55px rgba(60,90,85,.2),0 2px 8px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.7)">
+  <sc-for list="{{ v2.leaves }}" as="leaf" hint-placeholder-count="3">
+    <div style="position:absolute;width:170px;height:170px;left:{{leaf.left}};top:{{leaf.top}};transform:{{leaf.otransform}};opacity:{{leaf.opacity}};filter:{{leaf.filter}}">
+      <div style="position:absolute;inset:0;animation:{{leaf.anim}}">
+        <sc-for list="{{ petals }}" as="p" hint-placeholder-count="4">
+          <div style="position:absolute;left:50%;bottom:50%;width:46px;height:96px;margin-left:-23px;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;background:linear-gradient(160deg,rgba(219,234,230,.55),rgba(171,203,197,.2));transform-origin:50% 100%;transform:{{p.transform}};box-shadow:inset 0 0 12px rgba(255,255,255,.4)">
+            <div style="position:absolute;left:50%;top:9%;width:2px;height:78%;margin-left:-1px;background:linear-gradient(rgba(140,175,168,.4),rgba(140,175,168,0));border-radius:2px"></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v2.gems }}" as="gem" hint-placeholder-count="2">
+    <div style="position:absolute;left:{{gem.left}};top:{{gem.top}};width:{{gem.size}};height:{{gem.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{gem.anim}}">
+        <div style="position:absolute;inset:0;border-radius:3px;transform:rotate(45deg);background:{{gem.grad}};box-shadow:{{gem.shadow}},inset 0 0 6px rgba(255,255,255,.7)">
+          <div style="position:absolute;left:20%;top:18%;width:28%;height:28%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),transparent 70%)"></div>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v2.sparkles }}" as="s" hint-placeholder-count="5">
+    <div style="position:absolute;left:{{s.left}};top:{{s.top}};width:{{s.size}};height:{{s.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{s.anim}}">
+        <div style="position:absolute;left:50%;top:0;width:2px;height:100%;margin-left:-1px;background:linear-gradient(transparent,rgba(255,255,255,.9) 50%,transparent);border-radius:2px"></div>
+        <div style="position:absolute;top:50%;left:0;height:2px;width:100%;margin-top:-1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.9) 50%,transparent);border-radius:2px"></div>
+      </div>
+    </div>
+  </sc-for>
+  <div style="position:absolute;top:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 30px;font:600 15px system-ui;color:rgba(50,84,78,.7)"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="width:17px;height:10px;border-radius:2px;background:rgba(50,84,78,.55)"></div><div style="width:22px;height:11px;border:1.5px solid rgba(50,84,78,.5);border-radius:3px"></div></div></div>
+  <div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:3px;background:rgba(50,84,78,.32)"></div>
+</div>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Medical nod — petals + gems kept, sparkles become soft crosses, a slow vitals-style pulse at center</div>
+<div class="dv-card" style="width:340px;height:720px;border-radius:46px;overflow:hidden;position:relative;background:radial-gradient(125% 100% at 50% 28%,#fbfffe 0%,#eaf4f1 66%,#dbede9 100%);box-shadow:0 22px 55px rgba(60,90,85,.2),0 2px 8px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.7)">
+  <div style="position:absolute;left:50%;top:44%;width:210px;height:210px;border-radius:50%;border:1.5px solid rgba(74,168,158,.4);animation:pulse 7s ease-out infinite"></div>
+  <div style="position:absolute;left:50%;top:44%;width:210px;height:210px;border-radius:50%;border:1.5px solid rgba(74,168,158,.4);animation:pulse 7s ease-out -3.5s infinite"></div>
+  <sc-for list="{{ v3.leaves }}" as="leaf" hint-placeholder-count="3">
+    <div style="position:absolute;width:170px;height:170px;left:{{leaf.left}};top:{{leaf.top}};transform:{{leaf.otransform}};opacity:{{leaf.opacity}};filter:{{leaf.filter}}">
+      <div style="position:absolute;inset:0;animation:{{leaf.anim}}">
+        <sc-for list="{{ petals }}" as="p" hint-placeholder-count="4">
+          <div style="position:absolute;left:50%;bottom:50%;width:46px;height:96px;margin-left:-23px;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;background:linear-gradient(160deg,rgba(213,233,228,.55),rgba(160,200,193,.22));transform-origin:50% 100%;transform:{{p.transform}};box-shadow:inset 0 0 12px rgba(255,255,255,.4)">
+            <div style="position:absolute;left:50%;top:9%;width:2px;height:78%;margin-left:-1px;background:linear-gradient(rgba(120,168,160,.5),rgba(120,168,160,0));border-radius:2px"></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v3.gems }}" as="gem" hint-placeholder-count="3">
+    <div style="position:absolute;left:{{gem.left}};top:{{gem.top}};width:{{gem.size}};height:{{gem.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{gem.anim}}">
+        <div style="position:absolute;inset:0;border-radius:3px;transform:rotate(45deg);background:{{gem.grad}};box-shadow:{{gem.shadow}},inset 0 0 6px rgba(255,255,255,.7)">
+          <div style="position:absolute;left:20%;top:18%;width:28%;height:28%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),transparent 70%)"></div>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+  <sc-for list="{{ v3.sparkles }}" as="s" hint-placeholder-count="6">
+    <div style="position:absolute;left:{{s.left}};top:{{s.top}};width:{{s.size}};height:{{s.size}};transform:translate(-50%,-50%)">
+      <div style="position:absolute;inset:0;animation:{{s.anim}}">
+        <div style="position:absolute;left:50%;top:12%;width:3px;height:76%;margin-left:-1.5px;background:rgba(74,168,158,.7);border-radius:2px"></div>
+        <div style="position:absolute;top:50%;left:12%;height:3px;width:76%;margin-top:-1.5px;background:rgba(74,168,158,.7);border-radius:2px"></div>
+      </div>
+    </div>
+  </sc-for>
+  <div style="position:absolute;top:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 30px;font:600 15px system-ui;color:rgba(50,84,78,.7)"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="width:17px;height:10px;border-radius:2px;background:rgba(50,84,78,.55)"></div><div style="width:22px;height:11px;border:1.5px solid rgba(50,84,78,.5);border-radius:3px"></div></div></div>
+  <div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:3px;background:rgba(50,84,78,.32)"></div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "show <a class="dv-oid" href="#1a">1a</a> with a sample login card on top" · "make <a class="dv-oid" href="#1c">1c</a> the pulse slower and warmer" · "combine <a class="dv-oid" href="#1a">1a</a> gems with <a class="dv-oid" href="#1b">1b</a> spacing" · "give me a dark-mode version"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const P = d => ({ transform: `rotate(${d}deg)` });
+    const petals = [P(45), P(135), P(225), P(315)];
+    const L = (left, top, scale, rot, op, blur, anim) => ({
+      left, top,
+      otransform: `translate(-50%,-50%) rotate(${rot}deg) scale(${scale})`,
+      opacity: Math.min(op * 1.55, .82), filter: `blur(${(blur * 0.42).toFixed(2)}px)`, anim
+    });
+    const G = (left, top, size, kind, anim) => {
+      const teal = kind === 't';
+      return {
+        left, top, size: size + 'px',
+        grad: teal
+          ? 'linear-gradient(135deg,#f0fdfb,#a7e5dd 40%,#3aa89f 82%,#2b857d)'
+          : 'linear-gradient(135deg,#f6fdec,#cbeaa8 42%,#8fc76a 84%)',
+        shadow: teal
+          ? '0 0 12px rgba(110,210,200,.6)'
+          : '0 0 12px rgba(165,205,135,.55)',
+        anim
+      };
+    };
+    const S = (left, top, size, anim) => ({ left, top, size: size + 'px', anim });
+
+    const v1 = {
+      leaves: [
+        L('-3%', '5%', 1.2, 14, .52, 1.1, 'driftA 24s ease-in-out -1s infinite'),
+        L('7%', '30%', .78, -22, .36, 1.7, 'driftB 30s ease-in-out -4s infinite'),
+        L('100%', '-3%', 1.15, -24, .5, 1.2, 'driftB 26s ease-in-out -2s infinite'),
+        L('106%', '58%', 1.25, 8, .44, 1.5, 'driftA 28s ease-in-out -6s infinite'),
+        L('12%', '94%', 1.0, 28, .4, 1.5, 'driftA 26s ease-in-out -3s infinite'),
+        L('74%', '103%', 1.1, -14, .4, 1.35, 'driftB 30s ease-in-out -5s infinite')
+      ],
+      gems: [
+        G('26%', '16%', 16, 't', 'tw 5s ease-in-out -0.5s infinite'),
+        G('20%', '33%', 22, 't', 'tw 6s ease-in-out -2s infinite'),
+        G('30%', '63%', 30, 't', 'tw 5.5s ease-in-out -3s infinite'),
+        G('72%', '10%', 20, 't', 'tw 5s ease-in-out -1.5s infinite'),
+        G('82%', '22%', 26, 't', 'tw 6s ease-in-out -2.5s infinite'),
+        G('80%', '52%', 22, 't', 'tw 5s ease-in-out -4s infinite'),
+        G('22%', '20%', 12, 'g', 'tw 4.5s ease-in-out -1s infinite'),
+        G('66%', '72%', 14, 'g', 'tw 5s ease-in-out -2s infinite'),
+        G('90%', '40%', 10, 'g', 'tw 4.5s ease-in-out -3s infinite')
+      ],
+      sparkles: [
+        S('40%', '8%', 12, 'spk 5s ease-in-out -0.5s infinite'),
+        S('55%', '30%', 8, 'spk 4.5s ease-in-out -2s infinite'),
+        S('48%', '48%', 7, 'spk 5.5s ease-in-out -1s infinite'),
+        S('60%', '62%', 10, 'spk 5s ease-in-out -3s infinite'),
+        S('35%', '78%', 9, 'spk 4.5s ease-in-out -1.5s infinite'),
+        S('68%', '84%', 8, 'spk 5s ease-in-out -2.5s infinite'),
+        S('16%', '56%', 7, 'spk 4.5s ease-in-out -3.5s infinite'),
+        S('88%', '66%', 9, 'spk 5.5s ease-in-out -0.8s infinite'),
+        S('52%', '18%', 6, 'spk 5s ease-in-out -4s infinite'),
+        S('44%', '90%', 10, 'spk 4.5s ease-in-out -2.2s infinite')
+      ]
+    };
+
+    const v2 = {
+      leaves: [
+        L('-6%', '8%', 1.5, 10, .34, 1.6, 'driftA 30s ease-in-out -1s infinite'),
+        L('108%', '70%', 1.6, -12, .3, 1.8, 'driftB 34s ease-in-out -5s infinite'),
+        L('92%', '-6%', 1.0, -20, .22, 2.0, 'driftA 32s ease-in-out -3s infinite')
+      ],
+      gems: [
+        G('30%', '40%', 20, 't', 'tw 6s ease-in-out -1s infinite'),
+        G('70%', '58%', 16, 't', 'tw 5.5s ease-in-out -3s infinite')
+      ],
+      sparkles: [
+        S('50%', '20%', 10, 'spk 6s ease-in-out -1s infinite'),
+        S('40%', '52%', 8, 'spk 5.5s ease-in-out -2.5s infinite'),
+        S('62%', '38%', 7, 'spk 6s ease-in-out -1.8s infinite'),
+        S('34%', '74%', 8, 'spk 5.5s ease-in-out -3.5s infinite'),
+        S('68%', '80%', 9, 'spk 6s ease-in-out -0.6s infinite')
+      ]
+    };
+
+    const v3 = {
+      leaves: [
+        L('-4%', '6%', 1.2, 12, .32, 1.4, 'driftA 28s ease-in-out -1s infinite'),
+        L('104%', '64%', 1.3, 10, .3, 1.5, 'driftB 32s ease-in-out -4s infinite'),
+        L('82%', '-2%', 1.0, -18, .26, 1.6, 'driftA 30s ease-in-out -2.5s infinite')
+      ],
+      gems: [
+        G('28%', '24%', 22, 't', 'tw 5.5s ease-in-out -1s infinite'),
+        G('74%', '44%', 18, 't', 'tw 6s ease-in-out -2.5s infinite'),
+        G('50%', '74%', 16, 't', 'tw 5.5s ease-in-out -3.5s infinite')
+      ],
+      sparkles: [
+        S('44%', '14%', 14, 'plusTw 5s ease-in-out -0.5s infinite'),
+        S('62%', '32%', 12, 'plusTw 5.5s ease-in-out -2s infinite'),
+        S('34%', '54%', 11, 'plusTw 5s ease-in-out -1.2s infinite'),
+        S('70%', '64%', 13, 'plusTw 5.5s ease-in-out -3s infinite'),
+        S('28%', '82%', 12, 'plusTw 5s ease-in-out -1.8s infinite'),
+        S('56%', '90%', 11, 'plusTw 5.5s ease-in-out -2.6s infinite')
+      ]
+    };
+
+    // Turn 2: 1b spacing (few large petals, open center) + 1a gem density
+    const v4 = {
+      leaves: v2.leaves,
+      gems: [
+        G('24%', '14%', 16, 't', 'tw 5s ease-in-out -0.5s infinite'),
+        G('18%', '30%', 22, 't', 'tw 6s ease-in-out -2s infinite'),
+        G('78%', '20%', 20, 't', 'tw 5s ease-in-out -1.5s infinite'),
+        G('84%', '48%', 24, 't', 'tw 6s ease-in-out -2.5s infinite'),
+        G('26%', '70%', 26, 't', 'tw 5.5s ease-in-out -3s infinite'),
+        G('72%', '78%', 18, 't', 'tw 5s ease-in-out -4s infinite'),
+        G('20%', '18%', 11, 'g', 'tw 4.5s ease-in-out -1s infinite'),
+        G('66%', '60%', 13, 'g', 'tw 5s ease-in-out -2s infinite'),
+        G('88%', '34%', 10, 'g', 'tw 4.5s ease-in-out -3s infinite')
+      ],
+      sparkles: v1.sparkles
+    };
+
+    // Dark mode: same layout as v4, recoloured for a deep clinical night theme
+    const GD = (left, top, size, kind, anim) => {
+      const teal = kind === 't';
+      return {
+        left, top, size: size + 'px',
+        grad: teal
+          ? 'linear-gradient(135deg,#d9fff9,#5fd6cb 42%,#1f8c83 84%)'
+          : 'linear-gradient(135deg,#eaffd6,#a6de7d 44%,#5ba23e 86%)',
+        shadow: teal
+          ? '0 0 16px rgba(95,214,203,.75)'
+          : '0 0 16px rgba(140,205,110,.6)',
+        anim
+      };
+    };
+    const LD = (left, top, scale, rot, op, blur, anim) => ({
+      left, top,
+      otransform: `translate(-50%,-50%) rotate(${rot}deg) scale(${scale})`,
+      opacity: Math.min(op * 1.55, .82), filter: `blur(${(blur * 0.42).toFixed(2)}px)`, anim
+    });
+    const v5 = {
+      leaves: [
+        LD('-6%', '8%', 1.5, 10, .28, 1.6, 'driftA 30s ease-in-out -1s infinite'),
+        LD('108%', '70%', 1.6, -12, .26, 1.8, 'driftB 34s ease-in-out -5s infinite'),
+        LD('92%', '-6%', 1.0, -20, .2, 2.0, 'driftA 32s ease-in-out -3s infinite')
+      ],
+      gems: [
+        GD('24%', '14%', 16, 't', 'tw 5s ease-in-out -0.5s infinite'),
+        GD('18%', '30%', 22, 't', 'tw 6s ease-in-out -2s infinite'),
+        GD('78%', '20%', 20, 't', 'tw 5s ease-in-out -1.5s infinite'),
+        GD('84%', '48%', 24, 't', 'tw 6s ease-in-out -2.5s infinite'),
+        GD('26%', '70%', 26, 't', 'tw 5.5s ease-in-out -3s infinite'),
+        GD('72%', '78%', 18, 't', 'tw 5s ease-in-out -4s infinite'),
+        GD('20%', '18%', 11, 'g', 'tw 4.5s ease-in-out -1s infinite'),
+        GD('66%', '60%', 13, 'g', 'tw 5s ease-in-out -2s infinite'),
+        GD('88%', '34%', 10, 'g', 'tw 4.5s ease-in-out -3s infinite')
+      ],
+      sparkles: v1.sparkles
+    };
+
+    return { petals, v1, v2, v3, v4, v5 };
+  }
+}
+</script>
+</body>
+</html>

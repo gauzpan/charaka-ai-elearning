@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Obsidian vault (local-only progress log, not shared)
+obsidian-vault/
+
+# Playwright / screenshot artifacts
+.playwright-mcp/
+web/.playwright-mcp/
+*.png

@@ -1,0 +1,105 @@
+// Charaka AI — data model (MVP).
+// Plain Postgres so the same schema moves to Supabase later (swap DATABASE_URL).
+// Content (Module/Lesson/Card) lives as typed TS in src/content, NOT in the DB —
+// the DB holds user state and the two success metrics only.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Fixed to physician for the MVP; multi-role is a later release.
+enum Role {
+  PHYSICIAN
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  role        Role     @default(PHYSICIAN)
+  studyWindow String? // "commute" | "break" | "evening" — set in onboarding (M4)
+  focusTask   String? // the task they want to get better at (onboarding)
+  onboardedAt DateTime? // set when the 90-sec onboarding completes; gates /onboarding
+
+  // Streak is a user-level fact (moved here from Progress by design).
+  currentStreak  Int       @default(0)
+  lastActiveDate DateTime?
+
+  createdAt DateTime @default(now())
+
+  magicLinkTokens MagicLinkToken[]
+  progress        Progress[]
+  savedPrompts    SavedPrompt[]
+  applyIntents    ApplyIntent[]
+  savedTools      SavedTool[]
+}
+
+model MagicLinkToken {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  consumedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// One row per (user, lesson): how far through the lesson they are.
+model Progress {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  moduleId    String
+  lessonId    String
+  cardIndex   Int       @default(0) // last card reached
+  completedAt DateTime?
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+}
+
+// Success metric (b): a prompt the user chose to keep from a Try-it card.
+model SavedPrompt {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  taskId      String
+  promptText  String
+  rubricScore Int? // 0–4 from the client-side rubric (M3)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+// A tool the user bookmarked from the AI Toolkit (Resources). toolId is the
+// content slug from src/content/toolkit.ts (content is TS, not DB rows).
+model SavedTool {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  toolId    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, toolId])
+  @@index([userId])
+}
+
+// Success metric (a): the "I'll use this at work" tap on the recap card.
+model ApplyIntent {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  lessonId  String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

@@ -1,0 +1,23 @@
+# dev-only Postgres for Charaka AI. Supabase-ready: swap DATABASE_URL later,
+# the Prisma schema is plain Postgres. Not for production.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: charaka-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: charaka
+      POSTGRES_PASSWORD: charaka
+      POSTGRES_DB: charaka
+    ports:
+      - "5432:5432"
+    volumes:
+      - charaka-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U charaka -d charaka"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  charaka-db-data:

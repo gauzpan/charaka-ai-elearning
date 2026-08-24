@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Charaka AI design tokens — ported verbatim from design/design.md    */
+/* Premium utilitarian minimalism: warm monochrome, editorial serif,   */
+/* flat surfaces, emerald as the single accent. Light-only by design.  */
+/* ------------------------------------------------------------------ */
+
+:root {
+  /* canvas & surface */
+  --bg-canvas: #f4f6f8;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f8fafc;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+
+  /* text */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  /* interactive (emerald / forest green — the single accent) */
+  --action: #006c4c;
+  --action-hover: #00523a;
+  --on-action: #ffffff;
+
+  /* semantic (bg / text) — color is scarce, meaning-only */
+  --info-bg: #e0f2fe;      --info-text: #0369a1;
+  --success-bg: #e8f5e9;   --success-text: #006c4c;
+  --warning-bg: #fef3c7;   --warning-text: #b45309;
+  --error-bg: #fee2e2;     --error-text: #b91c1c;
+
+  /* radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+
+  /* elevation — nearly flat */
+  --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 600ms;
+
+  /* ambient background (design/app-bg.html · 2a light) — decorative layer */
+  --app-bg: linear-gradient(170deg, #fbfdfc 0%, #f1f7f4 60%, #e9f2ef 100%);
+  --petal-grad: linear-gradient(160deg, rgba(206, 227, 222, 0.7), rgba(158, 196, 189, 0.4));
+  --petal-vein: linear-gradient(rgba(140, 175, 168, 0.45), rgba(140, 175, 168, 0));
+  --gem-grad: linear-gradient(135deg, #f0fdfb, #a7e5dd 40%, #3aa89f 82%, #2b857d);
+  --gem-shadow: 0 0 12px rgba(110, 210, 200, 0.45);
+  --sparkle: rgba(255, 255, 255, 0.95);
+  --sparkle-core: #ffffff;
+  --sparkle-core-glow: rgba(255, 255, 255, 0.8);
+}
+
+/* ------------------------------------------------------------------ */
+/* Dark theme — deep clinical night (design/app-bg.html · 2b).         */
+/* Base tokens are redefined so every @theme-inline utility follows.   */
+/* Applied when the user picks dark, or by system pref unless the user  */
+/* has explicitly chosen light.                                        */
+/* ------------------------------------------------------------------ */
+:root { color-scheme: light; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg-canvas: #081a19;
+    --bg-surface: #0f2b28;
+    --bg-subtle: #0c2422;
+    --border: rgba(150, 210, 200, 0.14);
+    --border-strong: rgba(150, 210, 200, 0.26);
+
+    --text-primary: #eaf5f2;
+    --text-secondary: #a9c5bf;
+    --text-muted: #6f918b;
+
+    --action: #2f9e97;
+    --action-hover: #46b8b0;
+    --on-action: #05201d;
+
+    --info-bg: rgba(56, 189, 248, 0.15);   --info-text: #7dd3fc;
+    --success-bg: rgba(47, 158, 151, 0.18); --success-text: #7ee0d5;
+    --warning-bg: rgba(245, 158, 11, 0.16); --warning-text: #fcd34d;
+    --error-bg: rgba(248, 113, 113, 0.16);  --error-text: #fca5a5;
+
+    --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+    --app-bg: radial-gradient(125% 95% at 50% 34%, #12312e 0%, #0d2523 55%, #081a19 100%);
+    --petal-grad: linear-gradient(160deg, rgba(120, 180, 172, 0.42), rgba(70, 120, 114, 0.18));
+    --petal-vein: linear-gradient(rgba(160, 215, 205, 0.36), rgba(160, 215, 205, 0));
+    --gem-grad: linear-gradient(135deg, #d9fff9, #5fd6cb 42%, #1f8c83 84%);
+    --gem-shadow: 0 0 16px rgba(95, 214, 203, 0.7);
+    --sparkle: rgba(190, 240, 232, 0.95);
+    --sparkle-core: #eafffb;
+    --sparkle-core-glow: rgba(150, 230, 218, 0.85);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-canvas: #081a19;
+  --bg-surface: #0f2b28;
+  --bg-subtle: #0c2422;
+  --border: rgba(150, 210, 200, 0.14);
+  --border-strong: rgba(150, 210, 200, 0.26);
+
+  --text-primary: #eaf5f2;
+  --text-secondary: #a9c5bf;
+  --text-muted: #6f918b;
+
+  --action: #2f9e97;
+  --action-hover: #46b8b0;
+  --on-action: #05201d;
+
+  --info-bg: rgba(56, 189, 248, 0.15);   --info-text: #7dd3fc;
+  --success-bg: rgba(47, 158, 151, 0.18); --success-text: #7ee0d5;
+  --warning-bg: rgba(245, 158, 11, 0.16); --warning-text: #fcd34d;
+  --error-bg: rgba(248, 113, 113, 0.16);  --error-text: #fca5a5;
+
+  --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  --app-bg: radial-gradient(125% 95% at 50% 34%, #12312e 0%, #0d2523 55%, #081a19 100%);
+  --petal-grad: linear-gradient(160deg, rgba(120, 180, 172, 0.42), rgba(70, 120, 114, 0.18));
+  --petal-vein: linear-gradient(rgba(160, 215, 205, 0.36), rgba(160, 215, 205, 0));
+  --gem-grad: linear-gradient(135deg, #d9fff9, #5fd6cb 42%, #1f8c83 84%);
+  --gem-shadow: 0 0 16px rgba(95, 214, 203, 0.7);
+  --sparkle: rgba(190, 240, 232, 0.95);
+  --sparkle-core: #eafffb;
+  --sparkle-core-glow: rgba(150, 230, 218, 0.85);
+}
+
+/* Map tokens into Tailwind's theme so utilities exist:
+   bg-canvas, bg-surface, text-primary, border-default, text-action, etc. */
+@theme inline {
+  --color-canvas: var(--bg-canvas);
+  --color-surface: var(--bg-surface);
+  --color-subtle: var(--bg-subtle);
+  --color-default: var(--border);
+  --color-strong: var(--border-strong);
+
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+
+  --color-action: var(--action);
+  --color-action-hover: var(--action-hover);
+  --color-on-action: var(--on-action);
+
+  --color-info: var(--info-text);
+  --color-info-bg: var(--info-bg);
+  --color-success: var(--success-text);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning-text);
+  --color-warning-bg: var(--warning-bg);
+  --color-error: var(--error-text);
+  --color-error-bg: var(--error-bg);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-pill: var(--radius-pill);
+
+  /* fonts (variables provided by next/font in layout.tsx) */
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Modern display face for headings / wordmark. */
+h1, h2, .font-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Card/section entry — animate transform + opacity only (§6.6) */
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-card-in {
+  animation: card-in var(--dur) var(--ease-out) both;
+}
+
+/* Ambient background motion (design/app-bg.html) — transform/opacity only. */
+@keyframes driftA { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(5px, -9px) rotate(1.5deg); } }
+@keyframes driftB { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-6px, 7px) rotate(-1.5deg); } }
+@keyframes tw { 0%, 100% { opacity: .4; transform: scale(.85); } 50% { opacity: 1; transform: scale(1.06); } }
+@keyframes spk { 0%, 100% { opacity: .15; transform: scale(.5) rotate(0deg); } 50% { opacity: 1; transform: scale(1.1) rotate(45deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-card-in { animation: none; }
+  * { transition: none !important; }
+  .app-bg * { animation: none !important; }
+  /* Skeleton/loading pulses and any other keyframed motion (Tailwind
+     animate-pulse, spinners) must also settle — motion is never required. */
+  .animate-pulse,
+  [class*="animate-"] { animation: none !important; }
+}
