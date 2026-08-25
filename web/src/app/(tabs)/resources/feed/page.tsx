@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { buttonClasses } from "@/components/ui/Button";
+import { ScreenHeader } from "@/components/ui/ScreenHeader";
 
 // AI Feed — placeholder (design.md §5.3 empty state). No fabricated feed items:
 // explain what it will be and offer one way forward.
@@ -9,7 +10,7 @@ export default function FeedPage() {
     <div className="flex flex-col gap-5 animate-card-in">
       <Link
         href="/resources"
-        className="inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-wide text-secondary hover:text-primary"
+        className="inline-flex items-center gap-1.5 font-mono text-[12px] font-medium uppercase tracking-[0.06em] text-secondary hover:text-primary"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M15 18l-6-6 6-6" />
@@ -17,10 +18,7 @@ export default function FeedPage() {
         Resources
       </Link>
 
-      <div className="flex flex-col gap-1">
-        <p className="font-mono text-[12px] uppercase tracking-wide text-muted">AI Feed</p>
-        <h1 className="font-display text-2xl leading-tight text-primary">Not live yet</h1>
-      </div>
+      <ScreenHeader eyebrow="AI Feed" title="Not live yet" />
 
       <EmptyState
         title="A feed worth your time"

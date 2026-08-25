@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTryItCard, allTryItCards } from "@/content/modules";
 import { SandboxConsole } from "@/components/session/SandboxConsole";
+import { ScreenHeader } from "@/components/ui/ScreenHeader";
 
 // Standalone sandbox — the Try-it console reachable directly from Practice,
 // independent of lesson gating. Same component the in-lesson Try-it card uses.
@@ -22,7 +23,7 @@ export default async function PracticeTaskPage({
     <div className="flex flex-col gap-5 animate-card-in">
       <Link
         href="/practice"
-        className="inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-wide text-secondary hover:text-primary"
+        className="inline-flex items-center gap-1.5 font-mono text-[12px] font-medium uppercase tracking-[0.06em] text-secondary hover:text-primary"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M15 18l-6-6 6-6" />
@@ -30,11 +31,7 @@ export default async function PracticeTaskPage({
         Practice
       </Link>
 
-      <div className="flex flex-col gap-1">
-        <p className="font-mono text-[12px] uppercase tracking-wide text-muted">Sandbox</p>
-        <h1 className="font-display text-2xl leading-tight text-primary">{card.title}</h1>
-        <p className="text-secondary">{card.prompt}</p>
-      </div>
+      <ScreenHeader eyebrow="Sandbox" title={card.title} subtitle={card.prompt} />
 
       <SandboxConsole card={card} />
     </div>

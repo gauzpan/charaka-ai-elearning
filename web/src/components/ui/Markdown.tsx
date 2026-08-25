@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 // react-markdown does not emit raw HTML by default, so this is XSS-safe.
 export function Markdown({ children }: { children: string }) {
   return (
-    <div className="flex flex-col gap-3 text-sm leading-relaxed text-primary">
+    <div className="flex flex-col gap-3 text-[16px] leading-[26px] text-primary">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{

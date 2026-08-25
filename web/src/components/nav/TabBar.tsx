@@ -65,10 +65,22 @@ export function TabBar() {
   return (
     <nav
       aria-label="Primary"
-      className="sticky bottom-0 z-10 border-t bg-surface/95 backdrop-blur"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="sticky bottom-0 z-10 px-3 pb-3 pt-1 relative"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 12px)" }}
     >
-      <ul className="mx-auto flex max-w-[640px]">
+      {/* Floating elevated pill (design.md §6.4 soft elevation) — a scrim
+          behind it fades the content it overlaps so text never collides. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-24"
+        style={{
+          background: "linear-gradient(to top, var(--bg-canvas) 40%, transparent)",
+        }}
+      />
+      <ul
+        className="mx-auto flex max-w-[420px] items-center gap-1 rounded-pill border bg-surface/95 p-1.5 backdrop-blur"
+        style={{ boxShadow: "var(--shadow-elevated)" }}
+      >
         {tabs.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || pathname.startsWith(href + "/");
           return (
@@ -77,12 +89,12 @@ export function TabBar() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex flex-col items-center gap-1 py-2.5 text-[12px] transition-colors",
-                  active ? "text-action" : "text-muted hover:text-secondary",
+                  "flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-pill py-2 text-[12px] font-medium transition-colors duration-150 active:scale-[0.97]",
+                  active ? "bg-action/10 text-action" : "text-secondary hover:text-primary",
                 )}
               >
                 <Icon />
-                <span className="font-mono uppercase tracking-wide leading-none">
+                <span className="font-mono text-[11px] uppercase tracking-[0.04em] leading-none">
                   {label}
                 </span>
               </Link>

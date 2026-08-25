@@ -38,6 +38,19 @@
 
   /* elevation — nearly flat */
   --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.04);
+  /* soft, diffuse, large-blur elevation for tactile surfaces (design.md §6.4) */
+  --shadow-elevated: 0 1px 2px rgba(15, 23, 42, 0.03), 0 12px 32px rgba(15, 23, 42, 0.06);
+  --shadow-elevated-hover: 0 2px 4px rgba(15, 23, 42, 0.04), 0 16px 40px rgba(15, 23, 42, 0.09);
+  /* faint inner highlight for elevated/interactive surfaces */
+  --inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+  /* tactile button elevation (design.md §6.4/6.6): soft outer shadow tinted
+     with the action color + a faint inner highlight; pressed settles inward. */
+  --shadow-button: 0 1px 2px rgba(15, 23, 42, 0.06), 0 6px 14px rgba(0, 108, 76, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --shadow-button-hover: 0 2px 4px rgba(15, 23, 42, 0.08), 0 10px 20px rgba(0, 108, 76, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --shadow-button-active: inset 0 1px 3px rgba(0, 0, 0, 0.18);
 
   /* motion */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -85,6 +98,14 @@
     --error-bg: rgba(248, 113, 113, 0.16);  --error-text: #fca5a5;
 
     --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-elevated: 0 1px 2px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.35);
+    --shadow-elevated-hover: 0 2px 4px rgba(0, 0, 0, 0.25), 0 16px 40px rgba(0, 0, 0, 0.42);
+    --inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --shadow-button: 0 1px 2px rgba(0, 0, 0, 0.25), 0 6px 14px rgba(47, 158, 151, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --shadow-button-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(47, 158, 151, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --shadow-button-active: inset 0 1px 3px rgba(0, 0, 0, 0.35);
 
     --app-bg: radial-gradient(125% 95% at 50% 34%, #12312e 0%, #0d2523 55%, #081a19 100%);
     --petal-grad: linear-gradient(160deg, rgba(120, 180, 172, 0.42), rgba(70, 120, 114, 0.18));
@@ -119,6 +140,14 @@
   --error-bg: rgba(248, 113, 113, 0.16);  --error-text: #fca5a5;
 
   --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 1px 2px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.35);
+  --shadow-elevated-hover: 0 2px 4px rgba(0, 0, 0, 0.25), 0 16px 40px rgba(0, 0, 0, 0.42);
+  --inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-button: 0 1px 2px rgba(0, 0, 0, 0.25), 0 6px 14px rgba(47, 158, 151, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-button-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(47, 158, 151, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --shadow-button-active: inset 0 1px 3px rgba(0, 0, 0, 0.35);
 
   --app-bg: radial-gradient(125% 95% at 50% 34%, #12312e 0%, #0d2523 55%, #081a19 100%);
   --petal-grad: linear-gradient(160deg, rgba(120, 180, 172, 0.42), rgba(70, 120, 114, 0.18));
@@ -190,7 +219,52 @@ h1, h2, .font-display {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  line-height: 1.2;
+}
+
+/* ------------------------------------------------------------------ */
+/* Explicit type scale (stronger hierarchy, mobile readability pass).  */
+/* Same font families/colors as above — sizing + weight + line-height  */
+/* + tracking only. Class specificity beats the bare h1/h2 rule above. */
+/* ------------------------------------------------------------------ */
+
+/* Primary screen title. The one true "H1" per screen (design.md §6.2 h1,
+   pushed slightly larger/bolder for on-glance confidence during a shift). */
+.text-h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-size: 27px;
+  line-height: 35px;
+}
+
+/* Section / card / content title — one tier below the screen title. */
+.text-h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-size: 21px;
+  line-height: 28px;
+}
+
+/* Eyebrow / category label ("TODAY", "FOUNDATIONS", "CONCEPT"): quiet but
+   legible — medium weight and real letter-spacing carry it, not faintness. */
+.text-label {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Quiet utility layer: step counts, minute estimates, timestamps. Never the
+   only carrier of an instruction — always paired with a visible primary CTA. */
+.text-meta {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-secondary);
 }
 
 /* Card/section entry — animate transform + opacity only (§6.6) */

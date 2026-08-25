@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
+import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { cn } from "@/lib/cn";
 import { TOOLS, TOOLKIT_CATEGORIES, type Tool } from "@/content/toolkit";
 
@@ -86,7 +87,7 @@ export default function ToolkitPage() {
     <div className="flex min-h-full flex-col gap-6 animate-card-in">
       <Link
         href="/resources"
-        className="inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-wide text-secondary hover:text-primary"
+        className="inline-flex items-center gap-1.5 font-mono text-[12px] font-medium uppercase tracking-[0.06em] text-secondary hover:text-primary"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M15 18l-6-6 6-6" />
@@ -94,13 +95,11 @@ export default function ToolkitPage() {
         Resources
       </Link>
 
-      <div className="flex flex-col gap-1">
-        <p className="font-mono text-[12px] uppercase tracking-wide text-muted">AI Toolkit</p>
-        <h1 className="font-display text-2xl leading-tight text-primary">AI Tools for Healthcare</h1>
-        <p className="text-secondary">
-          Explore AI tools used across research, documentation, learning, and specialty care.
-        </p>
-      </div>
+      <ScreenHeader
+        eyebrow="AI Toolkit"
+        title="AI Tools for Healthcare"
+        subtitle="Explore AI tools used across research, documentation, learning, and specialty care."
+      />
 
       {/* Search */}
       <div className="relative">
@@ -155,7 +154,7 @@ export default function ToolkitPage() {
       </div>
 
       {/* Persistent governance footer */}
-      <p className="sticky bottom-0 -mx-5 border-t bg-surface/95 px-5 py-3 text-center text-[12px] leading-relaxed text-muted backdrop-blur">
+      <p className="sticky bottom-0 -mx-5 border-t bg-surface/95 px-5 py-3 text-center text-[12px] leading-relaxed text-secondary backdrop-blur">
         Always follow your organisation&rsquo;s privacy, procurement, and clinical-governance policies.
       </p>
     </div>
@@ -204,12 +203,12 @@ function FilterMenu({
         aria-expanded={open}
         className={cn(
           "flex h-11 w-full items-center justify-between gap-2 rounded-md border border-default bg-surface pl-3.5 pr-3",
-          "font-mono text-[12px] uppercase tracking-wide transition-colors",
+          "font-mono text-[12px] font-medium uppercase tracking-[0.06em] transition-colors",
           "hover:border-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
         )}
       >
         <span className="flex items-center gap-2 truncate">
-          <span className="text-muted">Filter by</span>
+          <span className="text-secondary">Filter by</span>
           <span className="text-primary">{currentLabel}</span>
         </span>
         <svg
@@ -229,7 +228,7 @@ function FilterMenu({
         <ul
           role="listbox"
           aria-label="Filter tools"
-          className="absolute left-0 right-0 z-20 mt-1 max-h-72 overflow-y-auto rounded-md border border-default bg-surface py-1 shadow-[var(--shadow-hover)]"
+          className="absolute left-0 right-0 z-20 mt-1 max-h-72 overflow-y-auto rounded-md border-0 bg-surface py-1 shadow-[var(--shadow-elevated)]"
         >
           {options.map((o) => {
             const selected = o.key === value;
@@ -243,7 +242,7 @@ function FilterMenu({
                   }}
                   className={cn(
                     "flex min-h-11 w-full items-center justify-between gap-2 px-3.5 py-2 text-left",
-                    "font-mono text-[12px] uppercase tracking-wide transition-colors",
+                    "font-mono text-[12px] font-medium uppercase tracking-[0.06em] transition-colors",
                     selected ? "text-action" : "text-secondary hover:bg-subtle hover:text-primary",
                   )}
                 >
@@ -283,12 +282,12 @@ function ToolItem({
       {/* Line 1: lettermark + name + bookmark */}
       <div className="flex items-center gap-3">
         <span
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-md border bg-subtle font-mono text-[13px] font-semibold uppercase text-secondary"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-pill bg-subtle font-mono text-[13px] font-semibold uppercase text-secondary"
           aria-hidden
         >
           {tool.mark}
         </span>
-        <h3 className="flex-1 text-primary">{tool.name}</h3>
+        <h3 className="flex-1 font-medium text-[17px] leading-[22px] text-primary">{tool.name}</h3>
         <button
           type="button"
           onClick={onToggle}
@@ -307,11 +306,11 @@ function ToolItem({
       </div>
 
       {/* Line 2: purpose */}
-      <p className="text-sm text-secondary">{tool.purpose}</p>
+      <p className="text-[15px] leading-[22px] text-secondary">{tool.purpose}</p>
 
       {/* Line 3: category • badge */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-[12px] uppercase tracking-wide text-muted">
+        <span className="text-meta">
           {tool.category}
         </span>
         <span className="text-muted" aria-hidden>&middot;</span>
@@ -323,7 +322,7 @@ function ToolItem({
         href={tool.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 self-start font-mono text-[13px] text-action hover:text-action-hover"
+        className="inline-flex items-center gap-1.5 self-start font-mono text-[13px] font-medium text-action hover:text-action-hover"
       >
         Visit official website
         <span aria-hidden>↗</span>

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Lesson, Module } from "@/content/types";
 import { Tag } from "@/components/ui/Tag";
+import { Card } from "@/components/ui/Card";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { buttonClasses } from "@/components/ui/Button";
 import { useProgress } from "@/lib/useProgress";
 import { shareUrl, shareText, linkedInHref, xHref } from "@/lib/share";
@@ -75,9 +77,7 @@ export function LessonComplete({
   return (
     <div className="mx-auto flex min-h-dvh max-w-[640px] flex-col bg-canvas">
       <header className="flex items-center justify-between gap-3 border-b bg-surface px-5 py-3">
-        <span className="font-mono text-[12px] uppercase tracking-wide text-muted">
-          {module.title}
-        </span>
+        <Eyebrow>{module.title}</Eyebrow>
         <button
           onClick={() => router.push("/journey")}
           aria-label="Close session"
@@ -95,18 +95,20 @@ export function LessonComplete({
             <div>
               <Tag tone="success">Lesson complete</Tag>
             </div>
-            <h1 className="font-display text-2xl leading-tight text-primary">{lesson.title}</h1>
-            <p className="text-secondary">
+            <h1 className="text-h1 text-primary">{lesson.title}</h1>
+            <p className="text-[16px] leading-[25px] text-secondary">
               {pointsAwarded > 0
                 ? `+${pointsAwarded} skill points — you're now at ${level.name} level.`
                 : `Reviewed. You're at ${level.name} level.`}
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 rounded-lg border bg-surface p-5">
+          <Card variant="elevated" className="flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
-              <h2 className="text-lg text-primary">Will you use this at work?</h2>
-              <p className="text-sm text-secondary">
+              <h2 className="text-[18px] font-semibold leading-[24px] text-primary">
+                Will you use this at work?
+              </h2>
+              <p className="text-[14px] leading-[20px] text-secondary">
                 The point isn&rsquo;t completion — it&rsquo;s real use in your next shift.
               </p>
             </div>
@@ -122,7 +124,7 @@ export function LessonComplete({
                 I&rsquo;ll use this at work
               </button>
             )}
-          </div>
+          </Card>
 
           {lesson.image && (
             // Content image of unknown dimensions — <img> keeps its natural aspect.
@@ -134,10 +136,12 @@ export function LessonComplete({
             />
           )}
 
-          <div className="flex flex-col gap-3 rounded-lg border bg-surface p-5">
+          <Card variant="elevated" className="flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
-              <h2 className="text-lg text-primary">Share what you learned</h2>
-              <p className="text-sm text-secondary">
+              <h2 className="text-[18px] font-semibold leading-[24px] text-primary">
+                Share what you learned
+              </h2>
+              <p className="text-[14px] leading-[20px] text-secondary">
                 Post your progress and inspire others.
               </p>
             </div>
@@ -166,7 +170,7 @@ export function LessonComplete({
                 </button>
               )}
             </div>
-          </div>
+          </Card>
         </div>
       </main>
 

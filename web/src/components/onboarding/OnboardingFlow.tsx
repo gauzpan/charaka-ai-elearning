@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button, buttonClasses } from "@/components/ui/Button";
 import { StepBar } from "@/components/ui/StepBar";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { cn } from "@/lib/cn";
 
 // 90-second onboarding (design.md §5.1): role is fixed (physician), so we ask
@@ -52,15 +53,13 @@ export function OnboardingFlow() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-[480px] flex-col gap-6 bg-canvas px-5 py-8">
       <div className="flex flex-col gap-3">
-        <p className="font-mono text-[12px] uppercase tracking-wide text-muted">
-          Set up · about a minute
-        </p>
+        <Eyebrow>Set up · about a minute</Eyebrow>
         <StepBar total={3} current={step + 1} />
       </div>
 
       {step === 0 && (
         <div className="flex flex-col gap-4 animate-card-in">
-          <h1 className="font-display text-2xl leading-tight text-primary">
+          <h1 className="text-h1 text-primary">
             What do you want to get better at with AI?
           </h1>
           <div className="flex flex-col gap-2">
@@ -81,10 +80,12 @@ export function OnboardingFlow() {
 
       {step === 1 && (
         <div className="flex flex-col gap-4 animate-card-in">
-          <h1 className="font-display text-2xl leading-tight text-primary">
+          <h1 className="text-h1 text-primary">
             When do you learn best?
           </h1>
-          <p className="text-secondary">We&rsquo;ll time a gentle nudge for that window.</p>
+          <p className="text-[16px] leading-[25px] text-secondary">
+            We&rsquo;ll time a gentle nudge for that window.
+          </p>
           <div className="flex flex-col gap-2">
             {WINDOWS.map((w) => (
               <OptionRow
@@ -108,19 +109,21 @@ export function OnboardingFlow() {
 
       {step === 2 && (
         <div className="flex flex-col gap-4 animate-card-in">
-          <h1 className="font-display text-2xl leading-tight text-primary">You&rsquo;re set.</h1>
-          <p className="text-secondary">
+          <h1 className="text-h1 text-primary">You&rsquo;re set.</h1>
+          <p className="text-[16px] leading-[25px] text-secondary">
             Two minutes now — by the end you&rsquo;ll know where AI actually fits in clinical work.
           </p>
-          <Card className="flex flex-col gap-3">
-            <p className="text-primary">Your first round: Prompting &amp; safe sharing</p>
+          <Card variant="hero" className="flex flex-col gap-3">
+            <p className="text-[16px] font-medium leading-[24px] text-primary">
+              Your first round: Prompting &amp; safe sharing
+            </p>
             <Link href={FIRST_LESSON} className={buttonClasses("primary", "w-full")}>
               Start your first round
             </Link>
           </Card>
           <button
             onClick={() => router.push("/today")}
-            className="font-mono text-[12px] text-secondary hover:text-primary"
+            className="font-mono text-[12px] font-medium text-secondary hover:text-primary"
           >
             Skip to Today
           </button>
@@ -145,11 +148,13 @@ function OptionRow({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "flex items-center justify-between rounded-md border bg-surface px-4 py-3 text-left transition-colors",
-        selected ? "border-action text-primary" : "hover:bg-subtle",
+        "flex items-center justify-between rounded-md border bg-surface px-4 py-3 text-left transition-[background-color,border-color,box-shadow] duration-150 active:scale-[0.99]",
+        selected
+          ? "border-action text-primary shadow-[var(--shadow-hover)]"
+          : "hover:bg-subtle",
       )}
     >
-      <span className="text-primary">{label}</span>
+      <span className="text-[16px] font-medium leading-[22px] text-primary">{label}</span>
       <span
         aria-hidden
         className={cn(

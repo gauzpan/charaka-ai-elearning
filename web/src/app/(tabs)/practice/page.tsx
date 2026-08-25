@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
+import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { allTryItCards } from "@/content/modules";
 import { cn } from "@/lib/cn";
 
@@ -56,16 +57,14 @@ export default function PracticePage() {
 
   return (
     <div className="flex flex-col gap-6 animate-card-in">
-      <div className="flex flex-col gap-1">
-        <p className="font-mono text-[12px] uppercase tracking-wide text-muted">Practice</p>
-        <h1 className="text-2xl text-primary">Sandbox</h1>
-        <p className="text-secondary">
-          Run a prompt against a synthetic case, get instant coaching, keep what works.
-        </p>
-      </div>
+      <ScreenHeader
+        eyebrow="Practice"
+        title="Sandbox"
+        subtitle="Run a prompt against a synthetic case, get instant coaching, keep what works."
+      />
 
       {/* Tab switch */}
-      <div className="flex gap-1 rounded-md border bg-subtle p-1">
+      <div className="flex gap-1 rounded-pill border bg-subtle p-1">
         <TabButton active={tab === "try"} onClick={() => setTab("try")}>
           Try a prompt
         </TabButton>
@@ -78,10 +77,15 @@ export default function PracticePage() {
         <div className="flex flex-col gap-3">
           {tasks.map((t) => (
             <Link key={t.taskId} href={`/practice/${t.taskId}`} className="block">
-              <Card hover className="flex items-center justify-between gap-3">
-                <div className="flex flex-col gap-0.5">
-                  <h3 className="text-primary">{t.title}</h3>
-                  <p className="text-sm text-muted">{label(t.taskId)}</p>
+              <Card variant="elevated" hover className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-pill bg-action/10 text-action">
+                    <FlaskIcon />
+                  </span>
+                  <div className="flex flex-col gap-0.5">
+                    <h3 className="font-medium text-primary">{t.title}</h3>
+                    <p className="text-[14px] leading-[20px] text-secondary">{label(t.taskId)}</p>
+                  </div>
                 </div>
                 <Tag tone="info">Try it</Tag>
               </Card>
@@ -140,8 +144,10 @@ function TabButton({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "flex-1 min-h-11 rounded-sm px-3 py-2 text-sm transition-colors",
-        active ? "bg-surface text-primary" : "text-secondary hover:text-primary",
+        "flex-1 min-h-11 rounded-pill px-3 py-2 text-sm transition-[background-color,box-shadow,color] duration-150",
+        active
+          ? "bg-surface text-primary shadow-[var(--shadow-hover)]"
+          : "text-secondary hover:text-primary",
       )}
     >
       {children}
@@ -171,7 +177,7 @@ function SavedPromptItem({ p }: { p: SavedPrompt }) {
         <Tag tone="neutral">{label(p.taskId)}</Tag>
         <div className="flex items-center gap-3">
           {p.rubricScore !== null && (
-            <span className="font-mono text-[12px] text-muted">{p.rubricScore}/4</span>
+            <span className="text-meta">{p.rubricScore}/4</span>
           )}
           <button
             type="button"
@@ -189,7 +195,7 @@ function SavedPromptItem({ p }: { p: SavedPrompt }) {
 
       <p
         className={cn(
-          "font-mono text-sm leading-relaxed text-primary",
+          "font-mono text-[15px] leading-[24px] text-primary",
           expanded ? "whitespace-pre-wrap" : "line-clamp-2",
         )}
       >
@@ -197,7 +203,7 @@ function SavedPromptItem({ p }: { p: SavedPrompt }) {
       </p>
 
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[12px] text-muted">
+        <span className="text-meta">
           {new Date(p.createdAt).toLocaleDateString()}
         </span>
         {expandable && (
@@ -211,6 +217,15 @@ function SavedPromptItem({ p }: { p: SavedPrompt }) {
         )}
       </div>
     </Card>
+  );
+}
+
+function FlaskIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M9 2v6.5L4.5 18a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L15 8.5V2" />
+      <path d="M8 2h8M7 15h10" />
+    </svg>
   );
 }
 

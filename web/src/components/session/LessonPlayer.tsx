@@ -6,6 +6,7 @@ import type { Lesson, Module } from "@/content/types";
 import { CardView } from "./CardView";
 import { LessonComplete } from "./LessonComplete";
 import { StepBar } from "@/components/ui/StepBar";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { buttonClasses } from "@/components/ui/Button";
 import { useProgress, POINTS_PER_LESSON } from "@/lib/useProgress";
 import { cn } from "@/lib/cn";
@@ -63,7 +64,10 @@ export function LessonPlayer({ module, lesson }: { module: Module; lesson: Lesso
   return (
     <div className="mx-auto flex min-h-dvh max-w-[640px] flex-col bg-canvas">
       {/* Session bar: close owns the screen exit; progress is always legible. */}
-      <header className="flex flex-col gap-3 border-b bg-surface px-5 py-3">
+      <header
+        className="flex flex-col gap-3 border-b bg-surface px-5 py-3"
+        style={{ boxShadow: "var(--shadow-hover)" }}
+      >
         <div className="flex items-center justify-between gap-3">
           <button
             onClick={() => router.push("/journey")}
@@ -74,21 +78,21 @@ export function LessonPlayer({ module, lesson }: { module: Module; lesson: Lesso
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </button>
-          <span className="truncate font-mono text-[12px] text-muted">{lesson.title}</span>
+          <span className="truncate font-mono text-[12px] font-medium text-secondary">
+            {lesson.title}
+          </span>
           <span className="w-9" />
         </div>
         <StepBar total={total} current={current + 1} />
-        <p className="font-mono text-[12px] text-muted">
+        <p className="text-meta">
           {current + 1} of {total} · ~{minsLeft} min left
         </p>
       </header>
 
       <main className="flex-1 overflow-y-auto px-5 pb-6 pt-6">
         <div key={current} className="animate-card-in">
-          <div className="mb-4">
-            <span className="font-mono text-[12px] uppercase tracking-wide text-muted">
-              {module.title}
-            </span>
+          <div className="mb-5">
+            <Eyebrow>{module.title}</Eyebrow>
           </div>
           <CardView card={lesson.cards[current]} />
         </div>

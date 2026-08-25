@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Button, buttonClasses } from "@/components/ui/Button";
 import { Tag } from "@/components/ui/Tag";
 import { AppBackground } from "@/components/bg/AppBackground";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 
 export default function SignInPage() {
   return (
@@ -58,15 +59,15 @@ function SignInContent() {
           <h1 className="font-display text-4xl font-semibold tracking-tight text-primary">
             Charaka AI
           </h1>
-          <p className="max-w-[320px] text-secondary">
+          <p className="max-w-[320px] text-[16px] leading-[25px] text-secondary">
             A workflow-first AI learning coach for healthcare professionals — learn by doing, in
             two-minute rounds.
           </p>
         </div>
 
-        <div className="flex w-full flex-col gap-1">
-          <h2 className="font-display text-2xl text-primary">Sign in</h2>
-          <p className="text-secondary">
+        <div className="flex w-full flex-col gap-1.5">
+          <h2 className="text-h2 text-primary">Sign in</h2>
+          <p className="text-[15px] leading-[23px] text-secondary">
             We&rsquo;ll send a one-time link — no password. Your progress and saved prompts live
             in your account.
           </p>
@@ -93,14 +94,14 @@ function SignInContent() {
             )}
             <button
               onClick={() => setStatus("idle")}
-              className="font-mono text-[12px] text-secondary hover:text-primary"
+              className="font-mono text-[12px] font-medium text-secondary hover:text-primary"
             >
               Use a different email
             </button>
           </Card>
         ) : (
           <form onSubmit={submit} className="flex w-full flex-col gap-3">
-            <label htmlFor="email" className="font-mono text-[12px] uppercase tracking-wide text-muted">
+            <label htmlFor="email" className="text-label">
               Work email
             </label>
             <input

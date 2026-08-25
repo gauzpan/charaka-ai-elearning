@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { cn } from "@/lib/cn";
 import { modules, lockedModules, getLesson } from "@/content/modules";
 import { useProgress, type LessonStatus } from "@/lib/useProgress";
@@ -16,8 +18,8 @@ function StatusDot({ status }: { status: LessonStatus }) {
       aria-hidden
       className={cn(
         "grid h-6 w-6 shrink-0 place-items-center rounded-pill border text-[12px]",
-        status === "completed" && "border-action bg-action text-on-action",
-        status === "current" && "border-action text-action",
+        status === "completed" && "border-action bg-action text-on-action shadow-[var(--shadow-hover)]",
+        status === "current" && "border-action text-action shadow-[var(--shadow-hover)]",
         status === "upcoming" && "border-strong text-muted",
         status === "locked" && "border-default text-muted",
       )}
@@ -47,7 +49,7 @@ function LessonRow({
         <StatusDot status={status} />
         <span className={cn("text-primary", locked && "text-muted")}>{title}</span>
       </div>
-      <span className="font-mono text-[12px] text-muted">
+      <span className="text-meta">
         {locked ? "Locked" : `${minutes} min`}
       </span>
     </div>
@@ -66,10 +68,10 @@ function LessonRow({
 
 function ModuleCard({ module, statusOf }: { module: Module; statusOf: (id: string) => LessonStatus }) {
   return (
-    <Card className="flex flex-col gap-2">
+    <Card variant="elevated" className="flex flex-col gap-2">
       <div className="flex flex-col gap-0.5">
-        <h2 className="text-lg text-primary">{module.title}</h2>
-        <p className="text-sm text-secondary">{module.subtitle}</p>
+        <h2 className="text-[18px] font-semibold leading-[24px] text-primary">{module.title}</h2>
+        <p className="text-[14px] leading-[20px] text-secondary">{module.subtitle}</p>
       </div>
       <div className="divide-y">
         {module.lessons.map((l) => (
@@ -102,20 +104,18 @@ function JourneyContent() {
 
   return (
     <div className="flex flex-col gap-6 animate-card-in">
-      <div className="flex flex-col gap-1">
-        <p className="font-mono text-[12px] uppercase tracking-wide text-muted">Journey</p>
-        <h1 className="text-2xl text-primary">Physician track</h1>
-        <p className="text-secondary">
-          Foundations first, then your real workflows. Two-minute rounds.
-        </p>
-      </div>
+      <ScreenHeader
+        eyebrow="Journey"
+        title="Physician track"
+        subtitle="Foundations first, then your real workflows. Two-minute rounds."
+      />
 
       {doneLesson && (
         <Card className="flex flex-col gap-1 border-success-bg bg-success-bg/40">
           <div className="mb-1">
             <Tag tone="success">Round complete</Tag>
           </div>
-          <p className="text-primary">
+          <p className="text-[16px] leading-[24px] text-primary">
             Nice — you finished &ldquo;{doneLesson.title}.&rdquo; Your next round is queued below.
           </p>
         </Card>
@@ -126,12 +126,12 @@ function JourneyContent() {
       ))}
 
       <div className="flex flex-col gap-3">
-        <p className="font-mono text-[12px] uppercase tracking-wide text-muted">Coming next</p>
+        <Eyebrow>Coming next</Eyebrow>
         {lockedModules.map((m) => (
-          <Card key={m.id} className="flex items-center justify-between gap-3 bg-subtle">
+          <Card key={m.id} variant="subtle" className="flex items-center justify-between gap-3">
             <div className="flex flex-col gap-0.5">
-              <h3 className="text-primary">{m.title}</h3>
-              <p className="text-sm text-muted">{m.why}</p>
+              <h3 className="font-medium text-primary">{m.title}</h3>
+              <p className="text-[14px] leading-[20px] text-secondary">{m.why}</p>
             </div>
             <Tag tone="neutral">Locked</Tag>
           </Card>

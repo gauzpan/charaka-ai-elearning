@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { buttonClasses } from "@/components/ui/Button";
+import { ProgressRing } from "@/components/ui/ProgressRing";
+import { ScreenHeader } from "@/components/ui/ScreenHeader";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { useProgress, LEVELS } from "@/lib/useProgress";
 import { allLessons } from "@/content/modules";
 
@@ -20,10 +23,7 @@ export default function ProgressPage() {
 
   return (
     <div className="flex flex-col gap-6 animate-card-in">
-      <div className="flex flex-col gap-1">
-        <p className="font-mono text-[12px] uppercase tracking-wide text-muted">Progress</p>
-        <h1 className="text-2xl text-primary">Where you stand</h1>
-      </div>
+      <ScreenHeader eyebrow="Progress" title="Where you stand" />
 
       {!ready ? (
         // Loading: stable-layout skeletons, never spinners (design.md §5.3).
@@ -46,26 +46,40 @@ export default function ProgressPage() {
         />
       ) : (
         <>
-          <Card className="flex flex-col gap-2">
-            <Tag tone="success">Experience level</Tag>
-            <p className="font-display text-2xl text-primary">{level.name}</p>
-            <p className="text-sm text-secondary">
-              {toNext !== null
-                ? `${skillPoints} skill points · ${toNext} to ${nextLevelName(level.next!)}`
-                : `${skillPoints} skill points · top level reached`}
-            </p>
+          {/* Dominant focal card — experience level, the one metric that matters. */}
+          <Card variant="hero" className="flex items-center gap-4">
+            <ProgressRing
+              value={level.next !== null ? ((skillPoints - level.min) / (level.next - level.min)) * 100 : 100}
+              size={64}
+              strokeWidth={5}
+              label="Level progress"
+            >
+              <span className="font-mono text-[11px] font-semibold text-secondary">
+                {skillPoints}
+              </span>
+            </ProgressRing>
+            <div className="flex flex-col gap-1">
+              <Tag tone="success">Experience level</Tag>
+              <p className="text-h2 text-primary">{level.name}</p>
+              <p className="text-[14px] leading-[20px] text-secondary">
+                {toNext !== null
+                  ? `${toNext} skill points to ${nextLevelName(level.next!)}`
+                  : "Top level reached"}
+              </p>
+            </div>
           </Card>
 
+          {/* Supporting modules — asymmetric pair, not a repeat of the hero. */}
           <div className="grid grid-cols-2 gap-4">
-            <Card className="flex flex-col gap-1">
-              <span className="font-mono text-[12px] uppercase tracking-wide text-muted">Skill points</span>
-              <span className="font-display text-3xl text-primary">{ready ? skillPoints : 0}</span>
-              <span className="text-sm text-secondary">earned by doing</span>
+            <Card variant="subtle" className="flex flex-col gap-1">
+              <Eyebrow>Skill points</Eyebrow>
+              <span className="font-display text-3xl font-semibold text-primary">{ready ? skillPoints : 0}</span>
+              <span className="text-[14px] leading-[20px] text-secondary">earned by doing</span>
             </Card>
-            <Card className="flex flex-col gap-1">
-              <span className="font-mono text-[12px] uppercase tracking-wide text-muted">Rounds</span>
-              <span className="font-display text-3xl text-primary">{done}</span>
-              <span className="text-sm text-secondary">of {total} done</span>
+            <Card variant="subtle" className="flex flex-col gap-1">
+              <Eyebrow>Rounds</Eyebrow>
+              <span className="font-display text-3xl font-semibold text-primary">{done}</span>
+              <span className="text-[14px] leading-[20px] text-secondary">of {total} done</span>
             </Card>
           </div>
         </>
