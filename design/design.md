@@ -7,7 +7,7 @@
 | :------------------------- | :------------------------------------------------------------------------------------------ |
 | **Product**               | Workflow-first, psychologically informed AI-literacy platform for healthcare professionals |
 | **Primary platform**      | Mobile-first (iOS / Android), responsive web as companion                                  |
-| **Design language**       | Premium utilitarian minimalism — warm monochrome, editorial type, flat surfaces            |
+| **Design language**       | Premium clinical editorialism — warm monochrome, layered tactile surfaces, soft dimensional depth            |
 | **Status**                | v1 foundation — living document                                                            |
 | **Audience for this doc** | Designers, engineers, content authors, PMs                                                 |
 
@@ -237,7 +237,15 @@ Use honest social signal: a cohort of role-peers, "3 colleagues finished this we
 
 ## **6 Foundations (basic elements / design tokens)**
 
-The visual system is **premium utilitarian minimalism**: warm monochrome canvas, editorial serif for headings, clean geometric sans for UI, muted pastels used *only* for semantic meaning. Clean and quiet so the content leads.
+The visual system is **premium clinical editorialism**: the existing warm monochrome canvas, editorial serif, geometric sans, emerald action color, and semantic pastels remain unchanged. The interface evolves from nearly-flat utilitarian surfaces into a **calm, layered, tactile, soft-dimensional experience**.
+
+Color remains scarce and meaningful. Dimensionality comes primarily from tonal separation, nested surfaces, soft light, subtle gradients derived from existing tokens, restrained blur, overlap, imagery, and motion — **not from introducing a new palette or decorating every component**.
+
+The intended feeling is:
+
+> **calm, credible, tactile, editorial, modern, and alive — never playful, glossy, noisy, or generic.**
+
+The interface should feel like a thoughtfully composed clinical instrument with the warmth of an editorial product, rather than a conventional flat SaaS dashboard.
 
 ### **6.1 Color**
 
@@ -309,28 +317,175 @@ Never use Inter, Roboto, or Open Sans (banned defaults). Type scale (mobile):
 | meta    | 12 / 16 mono  | Stats, tags, timers     |
 
 
-### **6.3 Spacing &amp; layout grid**
+### **6.3 Spacing, composition &amp; layout grid**
 
-4px base, 8-point rhythm: 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 Generous macro-whitespace between sections. Content column caps around 640px on web; edge padding 16–20px on mobile. Bento-style asymmetric cards on larger surfaces.
+Keep the 4px base and 8-point rhythm:
 
-### **6.4 Radius, borders, elevation**
+**4 · 8 · 12 · 16 · 24 · 32 · 48 · 64**
 
-- **Radius**: 8px default, 12px for large cards, 4px for buttons/inputs, 9999px for tags/badges only.  
-- **Borders**: exactly 1px solid var(--border) on every card and divider.  
-- **Elevation**: nearly flat. Rest  no shadow. Hover/active  0 2px 8px rgba(0,0,0,0.04) max. No shadow-md/lg/xl.
+Spacing is not only separation; it is a hierarchy tool. Use generous macro-whitespace around primary content and tighter rhythm inside a composed module.
 
-### **6.5 Iconography**
+Mobile edge padding remains **16–20px**. Content column caps around **640px on web**.
 
-Thicker-stroke technical set (Phosphor Bold/Fill or Radix), standardized stroke width, monochrome (--text-secondary), pastel background only when carrying a semantic state. No thin-line generic sets, no emoji anywhere.
+**Composition rule: design screens as scenes, not as stacks of components.**
 
-### **6.6 Motion**
+A typical mobile screen should contain a deliberate hierarchy:
 
-Invisible-but-present. Animate only transform and opacity.
+1. **Atmospheric canvas** — subtle tonal or radial light using existing neutral/semantic colors at very low opacity.
+2. **Primary content plane** — the dominant screen statement, next action, or key metric.
+3. **Secondary modules** — supporting cards with different visual weights.
+4. **Interactive layer** — pills, circular actions, progress controls, or floating navigation.
+5. **Micro-content** — metadata, timestamps, counts, and supporting context.
 
-- Card/section entry: translateY(12px)  fade over 600ms, cubic-bezier(0.16,1,0.3,1).  
-- Buttons: scale(0.98) on press.  
-- Staggered list reveals: 80ms cascade.  
-- Streak/badge earn: one restrained celebratory beat, then settle. Never confetti-storms. Respect prefers-reduced-motion.
+Avoid mechanically repeating identical full-width cards down the screen.
+
+Prefer compositions such as:
+
+- one dominant card + two compact supporting cards
+- a large metric followed by a visual progress module
+- horizontal rails for browseable secondary content
+- asymmetric bento groupings where the content benefits from comparison
+- an editorial hero that blends image/illustration and action
+- overlapping or nested controls where they clarify interaction
+
+Every screen still follows the product principle of **one clear title, one primary action, and one visible progress signal**. Expressive composition must improve hierarchy, not create additional decisions.
+
+### **6.4 Radius, borders, surfaces &amp; elevation**
+
+The previous radius scale remains the base system:
+
+- **Radius sm**: 4px — compact buttons, inputs, utility controls.
+- **Radius md**: 8px — standard components and nested modules.
+- **Radius lg**: 12px — large cards and primary content surfaces.
+- **Radius pill**: 9999px — tags, filters, segmented controls, compact status indicators.
+
+Do not make every component a giant rounded rectangle. Radius communicates hierarchy.
+
+**Surface model**
+
+Use tonal layering rather than a flat page containing identical white cards:
+
+- **Canvas** — `--bg-canvas`, optionally with a barely perceptible radial light or semantic tint at opacity ≤ 0.06.
+- **Primary surface** — `--bg-surface`.
+- **Nested surface** — `--bg-subtle`.
+- **Semantic surface** — existing semantic pastel backgrounds only when meaning supports their use.
+- **Elevated interaction** — a control that needs to feel touchable or temporarily above its parent.
+
+**Borders**
+
+`--border` remains part of the system, but a 1px border is **not mandatory on every card**. Use borders where they improve separation, especially for:
+
+- dense information surfaces
+- inputs
+- list rows
+- sheets
+- adjacent same-tone surfaces
+
+When tonal contrast, nesting, or elevation already establishes the boundary, omit the border.
+
+**Soft elevation**
+
+Depth must be subtle, calm, and physically believable:
+
+- Resting primary cards may have no shadow or an almost imperceptible ambient shadow.
+- Elevated cards may use a diffuse shadow with low opacity and a large blur.
+- Interactive elements can combine a soft outer shadow with a faint inner highlight.
+- Pressed elements should visually compress or settle closer to the parent surface.
+- Avoid dark, hard, or obviously "floating" shadows.
+- Never stack multiple heavy shadows.
+
+Depth should come from a combination of **tone + overlap + spacing + soft light + motion**, not shadow alone.
+
+### **6.5 Atmospheric treatment &amp; imagery**
+
+Do not introduce new brand colors.
+
+Use the existing palette to create restrained atmosphere:
+
+- `--bg-canvas` remains the dominant background.
+- `--bg-surface` and `--bg-subtle` establish tonal planes.
+- Existing info, success, warning, and error pastels may create soft contextual fields only when their semantic meaning remains intact.
+- `--action` remains the single strong interactive accent.
+
+Atmospheric treatments may include:
+
+- soft radial light
+- extremely low-opacity blurred fields
+- a semantic tint fading into the canvas
+- subtle texture or grain
+- a low-contrast illustration partially embedded into a card
+
+Background atmosphere must never reduce contrast or compete with clinical content.
+
+**Imagery and illustration are first-class UX elements when they improve comprehension or motivation.**
+
+Use:
+
+- respectful, role-relevant photography
+- desaturated, warm photography with subtle grain
+- monochromatic continuous-line clinical/technical illustrations
+- a single offset semantic pastel shape where appropriate
+- editorial cropping
+- image masks integrated into cards
+- illustrations that support empty, milestone, onboarding, or learning moments
+
+Avoid generic stock-photo rectangles. Images should participate in the composition and may extend to card edges or sit behind a readable content layer.
+
+### **6.6 Iconography &amp; tactile controls**
+
+Keep the thicker-stroke technical icon direction (Phosphor Bold/Fill or Radix) and standardized stroke weight.
+
+Icons remain predominantly `--text-secondary`. Existing semantic pastel backgrounds may sit behind an icon when they communicate a state.
+
+Prefer controls with a clear tactile identity:
+
+- circular utility actions for singular icon tasks
+- pill-shaped category filters
+- compact segmented controls
+- circular or rounded progress affordances
+- one visually dominant primary action per screen
+
+Avoid a screen full of identical rectangular buttons.
+
+Selected controls should change through a combination of:
+
+- fill or tonal plane
+- contrast
+- subtle elevation
+- icon/text state
+- restrained motion
+
+Do not rely on color alone.
+
+### **6.7 Motion &amp; state transitions**
+
+Motion is **invisible until it is useful**. It should make the interface feel responsive, connected, and physically coherent.
+
+Animate primarily:
+
+- `transform`
+- `opacity`
+
+Also animate progress values when the implementation can do so accessibly without causing layout instability.
+
+Motion patterns:
+
+- **Screen/section entry**: small translateY (8–12px) + fade; do not animate every element equally.
+- **Primary card reveal**: establish the main content first; supporting modules may follow with a restrained 60–80ms cascade.
+- **Button press**: scale to approximately `0.98`, then return with a quick settle.
+- **Pill selection**: background/indicator and content position should transition rather than jump.
+- **Card advance**: outgoing content exits and incoming content enters as one connected state change.
+- **Progress**: rings, bars, and segmented steps animate toward the new value rather than appearing instantaneously.
+- **Navigation**: the active indicator should move or morph between destinations when technically appropriate.
+- **Success/mastery**: one brief, restrained confirmation beat, then settle.
+
+Default easing remains:
+
+`cubic-bezier(0.16, 1, 0.3, 1)`
+
+Default long entry duration remains approximately **600ms**, but direct interactions should feel substantially faster. Do not make users wait for animation.
+
+Never use confetti storms, bouncing UI, continuous decorative motion, or motion that competes with reading. Respect `prefers-reduced-motion` and provide equivalent non-motion feedback.
 
 ### **6.7 Imagery &amp; illustration**
 
@@ -345,8 +500,9 @@ Each component lists purpose  key states. Build once; reuse everywhere (Principl
 | :----------------------------------- | :------------------------------------------------------- | :---------------------------------------------- |
 | **Primary button**                  | The single action per screen                            | default / hover / pressed / disabled / loading |
 | **Secondary / ghost button**        | Alternate action                                        | default / hover / disabled                     |
-| **Card (base)**                     | Container: 1px border, 12px radius, flat                | rest / hover-lift / selected                   |
-| **Lesson card**                     | Entry to a microsession — title, minutes, progress ring | not-started / in-progress / complete / locked  |
+| **Card (base)**                     | Layered content surface; tonal boundary first, optional 1px border, soft depth | rest / pressed / selected / elevated |
+| **Feature / hero card**             | Dominant editorial surface combining key action, visual context, and optional imagery | default / active / completed / loading |
+| **Lesson card**                     | Entry to a microsession — title, minutes, progress visualization, contextual payoff | not-started / in-progress / complete / locked  |
 | **Flashcard**                       | Two-sided recall                                        | front / flipped / known / review-again         |
 | **Quiz item**                       | One question per screen                                 | unanswered / correct / incorrect / explanation |
 | **Progress bar (segmented)**        | Steps in a session                                      | filled / current / upcoming                    |
@@ -354,7 +510,7 @@ Each component lists purpose  key states. Build once; reuse everywhere (Principl
 | **Streak indicator**                | Daily consistency                                       | active / at-risk / frozen                      |
 | **Competency badge**                | Mastery level per skill                                 | Aware / Practiced / Fluent / earned            |
 | **Tag / status chip**               | Meta labels                                             | pastel-semantic, uppercase, 12px mono          |
-| **Bottom tab bar**                  | Primary nav (5 max)                                     | active / inactive                              |
+| **Bottom tab bar**                  | Primary nav (5 max); may sit as a subtly elevated rounded surface when it improves focus | active / inactive / transitioning |
 | **Session player**                  | Linear card runner                                      | top step-bar one primary action                |
 | **List row**                        | Library/journey items                                   | default / pressed / locked                     |
 | **Bottom sheet / modal**            | Focused sub-task                                        | open / closing; dismissible                    |
@@ -364,7 +520,44 @@ Each component lists purpose  key states. Build once; reuse everywhere (Principl
 | **Empty / locked / offline states** | Recovery orientation                                    | see §5.3                                       |
 
 
-**Composition rule:** a screen shows one primary action, one clear title, and one visible progress signal. If a screen needs a second primary action, it needs to be two screens.
+**Composition rule:** a screen shows one primary action, one clear title, and one visible progress signal. The screen should be composed as a hierarchy of dominant and supporting surfaces rather than a uniform stack of cards. If a screen needs a second primary action, it needs to be two screens.
+
+### **7.1 Modern mobile interaction patterns**
+
+Use the following patterns selectively when they make a workflow clearer:
+
+- **Editorial hero surfaces** for Today, onboarding, milestones, and high-value learning moments.
+- **Asymmetric bento groups** for related metrics or options that benefit from scanning.
+- **Horizontally scrollable rails** for categories, journeys, tools, or recommendations.
+- **Pill filters and segmented controls** when users can browse a small set of visible options.
+- **Circular utility actions** for focused icon-only tasks.
+- **Visual progress modules** — rings, segmented bars, milestone maps, or compact data objects — instead of text-only completion status.
+- **Floating or elevated navigation** when persistent navigation benefits from separation from scrolling content.
+- **Bottom sheets** for focused secondary tasks without abandoning context.
+- **Progressive disclosure** for advanced clinical or AI detail.
+- **Contextual image/illustration cards** when visual context makes a concept faster to understand.
+
+Do not apply every pattern to every screen. Modernity comes from deliberate composition and interaction, not from maximum decoration.
+
+### **7.2 Anti-patterns**
+
+Reject:
+
+- generic white-card dashboards
+- identical cards repeated in long vertical stacks
+- every component having the same border, radius, and elevation
+- decorative gradients without informational purpose
+- semantic colors used as arbitrary decoration
+- glass effects that reduce readability
+- exaggerated 3D or glossy skeuomorphism
+- heavy shadows
+- tiny tap targets
+- hidden critical actions behind gestures
+- childish reward animations
+- dense enterprise-table layouts on mobile
+- motion added only because it looks "modern"
+
+The target is **soft dimensionality with professional restraint**, not visual novelty for its own sake.
 
 ## **8 Content &amp; voice**
 
@@ -476,3 +669,31 @@ CSS
   -ease-out: cubic-bezier(0.16, 1, 0.3, 1);  
   -dur: 600ms;  
 }  
+
+---
+
+## **Appendix — modern interface style directive**
+
+When implementing or generating new Charaka AI screens, preserve the existing tokens and follow this instruction:
+
+> **Keep the Charaka AI color palette, typography, semantic meanings, and clinical credibility exactly as defined in this system. Do not introduce a new visual palette. Replace generic flat UI compositions with a calm, premium, soft-dimensional mobile experience built from layered tonal surfaces, restrained atmospheric light, varied card hierarchy, editorial composition, tactile pill/circular controls, contextual imagery, visual progress, progressive disclosure, and purposeful microinteractions.**
+>
+> **Design the whole screen as a composition, not as a vertical stack of isolated components. Use one dominant focal point, supporting modules with varied visual weight, and clear thumb-zone actions. Create depth through tone, nesting, overlap, subtle elevation, and motion rather than heavy shadows or excessive decoration.**
+>
+> **The result must remain adult, evidence-based, accessible, clinically credible, and efficient for time-poor healthcare professionals. The interface should feel calm, tactile, modern, editorial, and alive — never childish, glossy, noisy, generic, or like a conventional flat SaaS dashboard.**
+
+### **Quick implementation checklist**
+
+- [ ] Existing color tokens remain unchanged.
+- [ ] Semantic pastel colors still communicate semantic meaning.
+- [ ] `--action` remains the dominant interactive accent.
+- [ ] Each screen has a clear dominant focal point.
+- [ ] Supporting cards vary in hierarchy, density, or composition where useful.
+- [ ] Depth comes from tonal layers, nesting, overlap, soft light, and subtle elevation.
+- [ ] Borders are used intentionally, not automatically around every card.
+- [ ] Primary actions are visually tactile and reachable in the thumb zone.
+- [ ] Progress is visual whenever possible.
+- [ ] Images/illustrations are integrated into the composition rather than dropped into generic rectangles.
+- [ ] Motion communicates state change, causality, or feedback.
+- [ ] Accessibility, contrast, reduced motion, and 44×44pt touch targets remain intact.
+- [ ] The final screen does not resemble a generic white-card dashboard.

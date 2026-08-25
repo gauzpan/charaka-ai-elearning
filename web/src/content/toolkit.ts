@@ -40,16 +40,7 @@ export interface Tool {
 
 export const TOOLS: Tool[] = [
   // Research
-  {
-    id: "openevidence",
-    name: "OpenEvidence",
-    mark: "OE",
-    purpose: "AI-supported search and summaries for medical evidence.",
-    category: "Research",
-    badge: "Clinical review required",
-    badgeTone: "warning",
-    url: "https://www.openevidence.com",
-  },
+
   {
     id: "consensus",
     name: "Consensus",

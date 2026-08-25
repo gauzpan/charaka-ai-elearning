@@ -2,10 +2,10 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Brandmark } from "@/components/nav/Brandmark";
 import { Card } from "@/components/ui/Card";
 import { Button, buttonClasses } from "@/components/ui/Button";
 import { Tag } from "@/components/ui/Tag";
+import { AppBackground } from "@/components/bg/AppBackground";
 
 export default function SignInPage() {
   return (
@@ -45,66 +45,83 @@ function SignInContent() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-[440px] flex-col justify-center gap-6 bg-canvas px-5">
-      <Brandmark />
-
-      <div className="flex flex-col gap-1">
-        <h1 className="font-display text-2xl text-primary">Sign in</h1>
-        <p className="text-secondary">
-          We&rsquo;ll send a one-time link — no password. Your progress and saved prompts live in
-          your account.
-        </p>
-      </div>
-
-      {linkError && (
-        <div className="rounded-md border border-error-bg bg-error-bg/40 p-3">
-          <p className="text-sm text-error">That link was invalid or expired. Request a new one.</p>
-        </div>
-      )}
-
-      {status === "sent" ? (
-        <Card className="flex flex-col gap-3">
-          <Tag tone="success">Link sent</Tag>
-          <p className="text-secondary">
-            {devLink
-              ? "Dev mode: the link is in your server console. You can also open it directly:"
-              : "Check your email for the sign-in link."}
-          </p>
-          {devLink && (
-            <a href={devLink} className={buttonClasses("primary", "w-full")}>
-              Open magic link
-            </a>
-          )}
-          <button
-            onClick={() => setStatus("idle")}
-            className="font-mono text-[12px] text-secondary hover:text-primary"
-          >
-            Use a different email
-          </button>
-        </Card>
-      ) : (
-        <form onSubmit={submit} className="flex flex-col gap-3">
-          <label htmlFor="email" className="font-mono text-[12px] uppercase tracking-wide text-muted">
-            Work email
-          </label>
-          <input
-            id="email"
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@clinic.org"
-            className="h-12 w-full rounded-sm border bg-surface px-4 text-base text-primary outline-none focus-visible:border-strong focus-visible:ring-2 focus-visible:ring-action"
+    <>
+      <AppBackground />
+      <main className="mx-auto flex min-h-dvh max-w-[440px] flex-col items-center justify-center gap-8 px-5 py-10">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <img
+            src="/app-logo.webp"
+            alt=""
+            aria-hidden
+            className="h-28 w-28 shrink-0 object-contain"
           />
-          <Button type="submit" loading={status === "sending"} className="w-full">
-            Send magic link
-          </Button>
-          {status === "error" && (
-            <p className="text-sm text-error">Something went wrong. Try again.</p>
-          )}
-        </form>
-      )}
-    </main>
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-primary">
+            Charaka AI
+          </h1>
+          <p className="max-w-[320px] text-secondary">
+            A workflow-first AI learning coach for healthcare professionals — learn by doing, in
+            two-minute rounds.
+          </p>
+        </div>
+
+        <div className="flex w-full flex-col gap-1">
+          <h2 className="font-display text-2xl text-primary">Sign in</h2>
+          <p className="text-secondary">
+            We&rsquo;ll send a one-time link — no password. Your progress and saved prompts live
+            in your account.
+          </p>
+        </div>
+
+        {linkError && (
+          <div className="w-full rounded-md border border-error-bg bg-error-bg/40 p-3">
+            <p className="text-sm text-error">That link was invalid or expired. Request a new one.</p>
+          </div>
+        )}
+
+        {status === "sent" ? (
+          <Card className="flex w-full flex-col gap-3">
+            <Tag tone="success">Link sent</Tag>
+            <p className="text-secondary">
+              {devLink
+                ? "Dev mode: the link is in your server console. You can also open it directly:"
+                : "Check your email for the sign-in link."}
+            </p>
+            {devLink && (
+              <a href={devLink} className={buttonClasses("primary", "w-full")}>
+                Open Email link
+              </a>
+            )}
+            <button
+              onClick={() => setStatus("idle")}
+              className="font-mono text-[12px] text-secondary hover:text-primary"
+            >
+              Use a different email
+            </button>
+          </Card>
+        ) : (
+          <form onSubmit={submit} className="flex w-full flex-col gap-3">
+            <label htmlFor="email" className="font-mono text-[12px] uppercase tracking-wide text-muted">
+              Work email
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@clinic.org"
+              className="h-12 w-full rounded-sm border bg-surface px-4 text-base text-primary outline-none focus-visible:border-strong focus-visible:ring-2 focus-visible:ring-action"
+            />
+            <Button type="submit" loading={status === "sending"} className="w-full">
+              Send Email code
+            </Button>
+            {status === "error" && (
+              <p className="text-sm text-error">Something went wrong. Try again.</p>
+            )}
+          </form>
+        )}
+      </main>
+    </>
   );
 }

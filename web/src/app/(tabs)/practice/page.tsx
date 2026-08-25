@@ -99,7 +99,11 @@ export default function PracticePage() {
               </p>
               <button
                 type="button"
-                onClick={() => setReloadKey((k) => k + 1)}
+                onClick={() => {
+                  setLoadError(false);
+                  setPrompts(null);
+                  setReloadKey((k) => k + 1);
+                }}
                 className="self-start font-mono text-[12px] text-action hover:text-action-hover"
               >
                 Retry

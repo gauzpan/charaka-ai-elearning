@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
@@ -121,19 +121,15 @@ export default function ToolkitPage() {
         />
       </div>
 
-      {/* Filter chips */}
-      <div className="-mx-5 overflow-x-auto px-5">
-        <div className="flex w-max gap-2">
-          {FILTERS.map((f) => (
-            <FilterChip key={f} active={filter === f} onClick={() => setFilter(f)}>
-              {f}
-            </FilterChip>
-          ))}
-          <FilterChip active={filter === "Saved"} onClick={() => setFilter("Saved")}>
-            {`Saved${savedCount > 0 ? ` · ${savedCount}` : ""}`}
-          </FilterChip>
-        </div>
-      </div>
+      {/* Filter — a single "Filter by" control that opens a vertical menu */}
+      <FilterMenu
+        value={filter}
+        options={[
+          ...FILTERS.map((f) => ({ key: f, label: f })),
+          { key: "Saved", label: `Saved${savedCount > 0 ? ` · ${savedCount}` : ""}` },
+        ]}
+        onSelect={(key) => setFilter(key as Filter)}
+      />
 
       {/* Tool list */}
       <div className="flex flex-1 flex-col gap-3">
@@ -166,29 +162,108 @@ export default function ToolkitPage() {
   );
 }
 
-function FilterChip({
-  active,
-  onClick,
-  children,
+// A single "Filter by" control: a button that opens a vertical menu of
+// options. Custom-built (not a native <select>) so the panel stays flat,
+// monochrome, and consistent with the app — closes on outside-click or Escape.
+function FilterMenu({
+  value,
+  options,
+  onSelect,
 }: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
+  value: string;
+  options: { key: string; label: string }[];
+  onSelect: (key: string) => void;
 }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onPointer(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const currentLabel = options.find((o) => o.key === value)?.label ?? value;
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        "shrink-0 rounded-pill border px-3.5 py-1.5 font-mono text-[12px] uppercase tracking-wide transition-colors",
-        active
-          ? "border-action bg-action text-on-action"
-          : "border-default bg-surface text-secondary hover:text-primary",
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={cn(
+          "flex h-11 w-full items-center justify-between gap-2 rounded-md border border-default bg-surface pl-3.5 pr-3",
+          "font-mono text-[12px] uppercase tracking-wide transition-colors",
+          "hover:border-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
+        )}
+      >
+        <span className="flex items-center gap-2 truncate">
+          <span className="text-muted">Filter by</span>
+          <span className="text-primary">{currentLabel}</span>
+        </span>
+        <svg
+          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className={cn(
+            "shrink-0 text-muted transition-transform duration-150",
+            open && "rotate-180",
+          )}
+          aria-hidden
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+
+      {open && (
+        <ul
+          role="listbox"
+          aria-label="Filter tools"
+          className="absolute left-0 right-0 z-20 mt-1 max-h-72 overflow-y-auto rounded-md border border-default bg-surface py-1 shadow-[var(--shadow-hover)]"
+        >
+          {options.map((o) => {
+            const selected = o.key === value;
+            return (
+              <li key={o.key} role="option" aria-selected={selected}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelect(o.key);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex min-h-11 w-full items-center justify-between gap-2 px-3.5 py-2 text-left",
+                    "font-mono text-[12px] uppercase tracking-wide transition-colors",
+                    selected ? "text-action" : "text-secondary hover:bg-subtle hover:text-primary",
+                  )}
+                >
+                  {o.label}
+                  {selected && (
+                    <svg
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                      className="shrink-0" aria-hidden
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       )}
-    >
-      {children}
-    </button>
+    </div>
   );
 }
 
