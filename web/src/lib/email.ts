@@ -32,14 +32,14 @@ export async function sendLoginCodeEmail(email: string, code: string): Promise<v
     return;
   }
 
-  const fromEmail = process.env.EMAIL_FROM;
-  if (!fromEmail) {
-    throw new Error("EMAIL_FROM is not set — required whenever MAILTRAP_API_TOKEN is set");
-  }
+  // const fromEmail = process.env.EMAIL_FROM;
+  // if (!fromEmail) {
+  //   throw new Error("EMAIL_FROM is not set — required whenever MAILTRAP_API_TOKEN is set");
+  // }
 
   try {
     await mailtrap().send({
-      from: { name: FROM_NAME, email: fromEmail },
+      from: { name: FROM_NAME, email: 'hello@demomailtrap.co' },
       to: [{ email }],
       subject: `${code} — your Charaka AI sign-in code`,
       text: `Your sign-in code is:\n\n${code}\n\nIt expires in 10 minutes. If you didn't request this, you can ignore it.`,
