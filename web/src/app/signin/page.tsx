@@ -136,7 +136,7 @@ function SignInContent() {
               <h2 className="text-h2 text-primary">Enter your code</h2>
               <p className="text-[15px] leading-[23px] text-secondary">
                 We sent a 6-digit code to <span className="font-medium text-primary">{email}</span>.
-                It expires in 10 minutes.
+                It expires in 10 minutes. In case, you don't see it in Inbox, check your Spam folder.
               </p>
             </div>
 
