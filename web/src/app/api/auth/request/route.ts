@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { generateCode, hashToken, TOKEN_TTL } from "@/lib/auth";
 import { sendLoginCodeEmail, emailDeliveryEnabled } from "@/lib/email";
 
-// Request a sign-in code, emailed via Resend. Without RESEND_API_KEY set
+// Request a sign-in code, emailed via Mailtrap. Without MAILTRAP_API_TOKEN set
 // (local dev, CI), the code is logged to the console and echoed in the
 // response instead — never in production, and never once real delivery is
 // configured.
