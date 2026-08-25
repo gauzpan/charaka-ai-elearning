@@ -14,8 +14,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# ("lib/" and "lib64/" intentionally omitted — this is a JS/TS repo, and a
+# blanket rule here was silently excluding web/src/lib/ from every commit.)
 parts/
 sdist/
 var/
@@ -223,4 +223,6 @@ obsidian-vault/
 # Playwright / screenshot artifacts
 .playwright-mcp/
 web/.playwright-mcp/
-*.png
+# (a blanket "*.png" was here — it was silently excluding every real PNG
+# asset in web/public, including the app logo, PWA icons, and lesson
+# images. The two directory rules above already cover Playwright output.)

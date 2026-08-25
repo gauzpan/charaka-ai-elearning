@@ -8,8 +8,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // Supabase's pooled (pgbouncer) connection — used at runtime by the app.
+  url       = env("DATABASE_URL")
+  // Supabase's direct connection — used only for migrations, which pgbouncer
+  // in transaction mode can't run. Same host, port 5432 instead of 6543.
+  directUrl = env("DIRECT_URL")
 }
 
 // Fixed to physician for the MVP; multi-role is a later release.

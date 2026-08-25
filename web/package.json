@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
+    "postinstall": "prisma generate",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:seed": "tsx prisma/seed.ts"
@@ -24,6 +25,7 @@
     "react-dom": "19.2.8",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "resend": "^6.22.1",
     "server-only": "^0.0.1",
     "zod": "^4.4.3"
   },

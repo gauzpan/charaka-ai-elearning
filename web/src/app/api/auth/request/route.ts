@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { generateToken, hashToken, TOKEN_TTL } from "@/lib/auth";
+import { sendMagicLinkEmail, emailDeliveryEnabled } from "@/lib/email";
 
-// Request a magic link. Dev delivery: the link is logged to the server console
-// (and returned in the response in dev) — swap in a real email sender later.
+// Request a magic link, emailed via Resend. Without RESEND_API_KEY set (local
+// dev, CI), the link is logged to the console and echoed in the response
+// instead — never in production, and never once real delivery is configured.
 export const runtime = "nodejs";
 
 const Body = z.object({ email: z.string().email().max(200) });
@@ -39,9 +41,13 @@ export async function POST(req: Request) {
   const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
   const link = `${origin}/api/auth/verify?token=${token}`;
 
-  // Dev delivery — no email provider yet.
-  console.log(`\n[auth] Magic link for ${email}:\n${link}\n`);
+  try {
+    await sendMagicLinkEmail(email, link);
+  } catch (err) {
+    console.error("[auth] failed to send magic link", err);
+    return Response.json({ error: "send_failed" }, { status: 502 });
+  }
 
-  const dev = process.env.NODE_ENV !== "production";
-  return Response.json({ ok: true, ...(dev ? { devLink: link } : {}) });
+  const showDevLink = !emailDeliveryEnabled() && process.env.NODE_ENV !== "production";
+  return Response.json({ ok: true, ...(showDevLink ? { devLink: link } : {}) });
 }
