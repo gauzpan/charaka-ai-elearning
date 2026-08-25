@@ -1,9 +1,9 @@
 import "server-only";
 import { Resend } from "resend";
 
-// Magic-link delivery. Falls back to console-log (dev/local) when RESEND_API_KEY
+// Login-code delivery. Falls back to console-log (dev/local) when RESEND_API_KEY
 // isn't set, so local dev and CI never need a real email provider. Once the key
-// is present (Vercel prod/preview), links are actually emailed and never echoed
+// is present (Vercel prod/preview), codes are actually emailed and never echoed
 // back in the API response — see api/auth/request/route.ts.
 
 const FROM = process.env.EMAIL_FROM || "Charaka AI <onboarding@resend.dev>";
@@ -18,21 +18,21 @@ export function emailDeliveryEnabled(): boolean {
   return Boolean(process.env.RESEND_API_KEY);
 }
 
-export async function sendMagicLinkEmail(email: string, link: string): Promise<void> {
+export async function sendLoginCodeEmail(email: string, code: string): Promise<void> {
   if (!emailDeliveryEnabled()) {
-    console.log(`\n[auth] Magic link for ${email}:\n${link}\n`);
+    console.log(`\n[auth] Login code for ${email}: ${code}\n`);
     return;
   }
 
   const { error } = await resend().emails.send({
     from: FROM,
     to: email,
-    subject: "Sign in to Charaka AI",
-    text: `Sign in with this link (expires in 15 minutes):\n\n${link}\n\nIf you didn't request this, you can ignore it.`,
+    subject: `${code} — your Charaka AI sign-in code`,
+    text: `Your sign-in code is:\n\n${code}\n\nIt expires in 10 minutes. If you didn't request this, you can ignore it.`,
     html: `
-      <p>Tap below to sign in to Charaka AI. This link expires in 15 minutes.</p>
-      <p><a href="${link}">Sign in to Charaka AI</a></p>
-      <p style="color:#666;font-size:13px">If you didn't request this, you can ignore it.</p>
+      <p>Your Charaka AI sign-in code:</p>
+      <p style="font-size:28px;font-weight:600;letter-spacing:0.1em;font-family:monospace">${code}</p>
+      <p style="color:#666;font-size:13px">Expires in 10 minutes. If you didn't request this, you can ignore it.</p>
     `,
   });
 

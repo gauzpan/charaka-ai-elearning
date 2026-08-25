@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { generateToken, hashToken, TOKEN_TTL } from "@/lib/auth";
-import { sendMagicLinkEmail, emailDeliveryEnabled } from "@/lib/email";
+import { generateCode, hashToken, TOKEN_TTL } from "@/lib/auth";
+import { sendLoginCodeEmail, emailDeliveryEnabled } from "@/lib/email";
 
-// Request a magic link, emailed via Resend. Without RESEND_API_KEY set (local
-// dev, CI), the link is logged to the console and echoed in the response
-// instead — never in production, and never once real delivery is configured.
+// Request a sign-in code, emailed via Resend. Without RESEND_API_KEY set
+// (local dev, CI), the code is logged to the console and echoed in the
+// response instead — never in production, and never once real delivery is
+// configured.
 export const runtime = "nodejs";
 
 const Body = z.object({ email: z.string().email().max(200) });
@@ -29,25 +30,22 @@ export async function POST(req: Request) {
     create: { email, role: "PHYSICIAN" },
   });
 
-  const token = generateToken();
+  const code = generateCode();
   await prisma.magicLinkToken.create({
     data: {
       userId: user.id,
-      tokenHash: hashToken(token),
+      tokenHash: hashToken(code),
       expiresAt: new Date(Date.now() + TOKEN_TTL),
     },
   });
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
-  const link = `${origin}/api/auth/verify?token=${token}`;
-
   try {
-    await sendMagicLinkEmail(email, link);
+    await sendLoginCodeEmail(email, code);
   } catch (err) {
-    console.error("[auth] failed to send magic link", err);
+    console.error("[auth] failed to send login code", err);
     return Response.json({ error: "send_failed" }, { status: 502 });
   }
 
-  const showDevLink = !emailDeliveryEnabled() && process.env.NODE_ENV !== "production";
-  return Response.json({ ok: true, ...(showDevLink ? { devLink: link } : {}) });
+  const showDevCode = !emailDeliveryEnabled() && process.env.NODE_ENV !== "production";
+  return Response.json({ ok: true, ...(showDevCode ? { devCode: code } : {}) });
 }

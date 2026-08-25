@@ -1,10 +1,8 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Card } from "@/components/ui/Card";
-import { Button, buttonClasses } from "@/components/ui/Button";
-import { Tag } from "@/components/ui/Tag";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
 import { AppBackground } from "@/components/bg/AppBackground";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 
@@ -16,17 +14,21 @@ export default function SignInPage() {
   );
 }
 
-type Status = "idle" | "sending" | "sent" | "error";
+type Step = "email" | "code";
 
 function SignInContent() {
-  const linkError = useSearchParams().get("error") === "link";
+  const router = useRouter();
+  const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<Status>("idle");
-  const [devLink, setDevLink] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [devCode, setDevCode] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus("sending");
+  async function requestCode() {
+    setSending(true);
+    setError(null);
     try {
       const res = await fetch("/api/auth/request", {
         method: "POST",
@@ -35,13 +37,40 @@ function SignInContent() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setStatus("error");
+        setError("Couldn't send a code. Try again.");
         return;
       }
-      setDevLink(data.devLink ?? null);
-      setStatus("sent");
+      setDevCode(data.devCode ?? null);
+      setCode("");
+      setStep("code");
     } catch {
-      setStatus("error");
+      setError("Couldn't send a code. Try again.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function verifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    setVerifying(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/auth/verify-code", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, code }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError("That code is wrong or expired. Try again or resend.");
+        setCode("");
+        return;
+      }
+      router.push(data.redirect);
+    } catch {
+      setError("Something went wrong. Try again.");
+    } finally {
+      setVerifying(false);
     }
   }
 
@@ -65,62 +94,104 @@ function SignInContent() {
           </p>
         </div>
 
-        <div className="flex w-full flex-col gap-1.5">
-          <h2 className="text-h2 text-primary">Sign in</h2>
-          <p className="text-[15px] leading-[23px] text-secondary">
-            We&rsquo;ll send a one-time link — no password. Your progress and saved prompts live
-            in your account.
-          </p>
-        </div>
+        {step === "email" ? (
+          <>
+            <div className="flex w-full flex-col gap-1.5">
+              <h2 className="text-h2 text-primary">Sign in</h2>
+              <p className="text-[15px] leading-[23px] text-secondary">
+                We&rsquo;ll email you a one-time code — no password. Your progress and saved
+                prompts live in your account.
+              </p>
+            </div>
 
-        {linkError && (
-          <div className="w-full rounded-md border border-error-bg bg-error-bg/40 p-3">
-            <p className="text-sm text-error">That link was invalid or expired. Request a new one.</p>
-          </div>
-        )}
-
-        {status === "sent" ? (
-          <Card className="flex w-full flex-col gap-3">
-            <Tag tone="success">Link sent</Tag>
-            <p className="text-secondary">
-              {devLink
-                ? "Dev mode: the link is in your server console. You can also open it directly:"
-                : "Check your email for the sign-in link."}
-            </p>
-            {devLink && (
-              <a href={devLink} className={buttonClasses("primary", "w-full")}>
-                Open Email link
-              </a>
-            )}
-            <button
-              onClick={() => setStatus("idle")}
-              className="font-mono text-[12px] font-medium text-secondary hover:text-primary"
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                requestCode();
+              }}
+              className="flex w-full flex-col gap-3"
             >
-              Use a different email
-            </button>
-          </Card>
+              <label htmlFor="email" className="text-label">
+                Work email
+              </label>
+              <input
+                id="email"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@clinic.org"
+                className="h-12 w-full rounded-sm border bg-surface px-4 text-base text-primary outline-none focus-visible:border-strong focus-visible:ring-2 focus-visible:ring-action"
+              />
+              <Button type="submit" loading={sending} className="w-full">
+                Send code
+              </Button>
+              {error && <p className="text-[15px] leading-[22px] text-error">{error}</p>}
+            </form>
+          </>
         ) : (
-          <form onSubmit={submit} className="flex w-full flex-col gap-3">
-            <label htmlFor="email" className="text-label">
-              Work email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@clinic.org"
-              className="h-12 w-full rounded-sm border bg-surface px-4 text-base text-primary outline-none focus-visible:border-strong focus-visible:ring-2 focus-visible:ring-action"
-            />
-            <Button type="submit" loading={status === "sending"} className="w-full">
-              Send Email code
-            </Button>
-            {status === "error" && (
-              <p className="text-sm text-error">Something went wrong. Try again.</p>
+          <>
+            <div className="flex w-full flex-col gap-1.5">
+              <h2 className="text-h2 text-primary">Enter your code</h2>
+              <p className="text-[15px] leading-[23px] text-secondary">
+                We sent a 6-digit code to <span className="font-medium text-primary">{email}</span>.
+                It expires in 10 minutes.
+              </p>
+            </div>
+
+            {devCode && (
+              <div className="w-full rounded-md border border-info-bg bg-info-bg/40 p-3">
+                <Eyebrow>Dev mode — email not configured</Eyebrow>
+                <p className="mt-1 font-mono text-[20px] font-semibold tracking-[0.15em] text-info">
+                  {devCode}
+                </p>
+              </div>
             )}
-          </form>
+
+            <form onSubmit={verifyCode} className="flex w-full flex-col gap-3">
+              <label htmlFor="code" className="text-label">
+                6-digit code
+              </label>
+              <input
+                id="code"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                required
+                maxLength={6}
+                pattern="\d{6}"
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                placeholder="000000"
+                className="h-14 w-full rounded-sm border bg-surface px-4 text-center font-mono text-[24px] tracking-[0.3em] text-primary outline-none focus-visible:border-strong focus-visible:ring-2 focus-visible:ring-action"
+              />
+              <Button type="submit" loading={verifying} disabled={code.length !== 6} className="w-full">
+                Verify
+              </Button>
+              {error && <p className="text-[15px] leading-[22px] text-error">{error}</p>}
+              <div className="flex items-center justify-between pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep("email");
+                    setError(null);
+                  }}
+                  className="font-mono text-[12px] font-medium text-secondary hover:text-primary"
+                >
+                  Use a different email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => requestCode()}
+                  disabled={sending}
+                  className="font-mono text-[12px] font-medium text-secondary hover:text-primary disabled:opacity-50"
+                >
+                  Resend code
+                </button>
+              </div>
+            </form>
+          </>
         )}
       </main>
     </>

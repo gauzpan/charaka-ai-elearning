@@ -1,16 +1,18 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 
-// Lightweight magic-link session (build-plan Phase 7). No third-party auth lib —
-// the MagicLinkToken table + a signed HttpOnly cookie carry it. AUTH_SECRET
-// signs the cookie; tokens are stored only as SHA-256 hashes.
+// Lightweight session (build-plan Phase 7). No third-party auth lib — sign-in
+// is a one-time numeric code emailed to the user; the MagicLinkToken table +
+// a signed HttpOnly cookie carry the session. AUTH_SECRET signs the cookie;
+// codes are stored only as SHA-256 hashes, never in plaintext.
 
 export const SESSION_COOKIE = "charaka_session";
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-const TOKEN_TTL_MS = 15 * 60 * 1000; // magic link valid 15 minutes
+const TOKEN_TTL_MS = 10 * 60 * 1000; // login code valid 10 minutes
+export const MAX_CODE_ATTEMPTS = 5;
 
 function secret(): string {
   const s = process.env.AUTH_SECRET;
@@ -22,14 +24,21 @@ function sign(value: string): string {
   return createHmac("sha256", secret()).update(value).digest("base64url");
 }
 
-/** Random single-use token (the raw value goes in the email link). */
-export function generateToken(): string {
-  return randomBytes(32).toString("base64url");
+/** Random single-use 6-digit login code (the raw value goes in the email). */
+export function generateCode(): string {
+  return randomInt(0, 1_000_000).toString().padStart(6, "0");
 }
 
 /** Only the hash is stored, so a DB leak can't be replayed. */
 export function hashToken(raw: string): string {
   return createHash("sha256").update(raw).digest("hex");
+}
+
+/** Constant-time comparison of a raw code against a stored hash. */
+export function verifyCodeHash(raw: string, storedHash: string): boolean {
+  const a = Buffer.from(hashToken(raw));
+  const b = Buffer.from(storedHash);
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 /** The signed cookie value for a user id — set on a response to log them in. */

@@ -42,6 +42,8 @@ model User {
   savedTools      SavedTool[]
 }
 
+// Sign-in via a one-time numeric code, emailed to the user (model name kept
+// for migration continuity — it stores a hashed login code, not a link URL).
 model MagicLinkToken {
   id        String    @id @default(cuid())
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -49,6 +51,11 @@ model MagicLinkToken {
   tokenHash String    @unique
   expiresAt DateTime
   consumedAt DateTime?
+  // Failed verification attempts against this code. Capped in application
+  // code (MAX_CODE_ATTEMPTS) — a 6-digit code has far less entropy than the
+  // old 32-byte token, so this is what keeps it from being brute-forceable
+  // within its short TTL.
+  attempts  Int       @default(0)
 
   createdAt DateTime @default(now())
 
