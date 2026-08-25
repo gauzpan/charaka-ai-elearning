@@ -3,9 +3,9 @@
 /* ------------------------------------------------------------------ */
 /* Charaka AI design tokens — ported verbatim from design/design.md    */
 /* Premium utilitarian minimalism: warm monochrome, editorial serif,   */
-/* flat surfaces, emerald as the single accent. Dark is default (below);  */
-/* these are the light-theme override values, used when the user picks   */
-/* light explicitly.                                                     */
+/* flat surfaces, emerald as the single accent. These are the light-theme  */
+/* values — the default when the device has no dark preference, or the    */
+/* user explicitly picks light.                                           */
 /* ------------------------------------------------------------------ */
 
 :root {
@@ -72,50 +72,53 @@
 /* ------------------------------------------------------------------ */
 /* Dark theme — deep clinical night (design/app-bg.html · 2b).         */
 /* Base tokens are redefined so every @theme-inline utility follows.   */
-/* Dark is the product default, regardless of device preference — it   */
-/* applies unconditionally unless the user explicitly picks light.     */
+/* Applied when the device prefers dark (system default) or the user   */
+/* explicitly picks dark; suppressed if the user explicitly picks      */
+/* light, even on a dark-preferring device.                            */
 /* ------------------------------------------------------------------ */
 :root { color-scheme: light; }
 
-:root:not([data-theme="light"]) {
-  color-scheme: dark;
-  --bg-canvas: #081a19;
-  --bg-surface: #0f2b28;
-  --bg-subtle: #0c2422;
-  --border: rgba(150, 210, 200, 0.14);
-  --border-strong: rgba(150, 210, 200, 0.26);
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg-canvas: #081a19;
+    --bg-surface: #0f2b28;
+    --bg-subtle: #0c2422;
+    --border: rgba(150, 210, 200, 0.14);
+    --border-strong: rgba(150, 210, 200, 0.26);
 
-  --text-primary: #eaf5f2;
-  --text-secondary: #a9c5bf;
-  --text-muted: #6f918b;
+    --text-primary: #eaf5f2;
+    --text-secondary: #a9c5bf;
+    --text-muted: #6f918b;
 
-  --action: #2f9e97;
-  --action-hover: #46b8b0;
-  --on-action: #05201d;
+    --action: #2f9e97;
+    --action-hover: #46b8b0;
+    --on-action: #05201d;
 
-  --info-bg: rgba(56, 189, 248, 0.15);   --info-text: #7dd3fc;
-  --success-bg: rgba(47, 158, 151, 0.18); --success-text: #7ee0d5;
-  --warning-bg: rgba(245, 158, 11, 0.16); --warning-text: #fcd34d;
-  --error-bg: rgba(248, 113, 113, 0.16);  --error-text: #fca5a5;
+    --info-bg: rgba(56, 189, 248, 0.15);   --info-text: #7dd3fc;
+    --success-bg: rgba(47, 158, 151, 0.18); --success-text: #7ee0d5;
+    --warning-bg: rgba(245, 158, 11, 0.16); --warning-text: #fcd34d;
+    --error-bg: rgba(248, 113, 113, 0.16);  --error-text: #fca5a5;
 
-  --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-elevated: 0 1px 2px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.35);
-  --shadow-elevated-hover: 0 2px 4px rgba(0, 0, 0, 0.25), 0 16px 40px rgba(0, 0, 0, 0.42);
-  --inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --shadow-button: 0 1px 2px rgba(0, 0, 0, 0.25), 0 6px 14px rgba(47, 158, 151, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  --shadow-button-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(47, 158, 151, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  --shadow-button-active: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+    --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-elevated: 0 1px 2px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.35);
+    --shadow-elevated-hover: 0 2px 4px rgba(0, 0, 0, 0.25), 0 16px 40px rgba(0, 0, 0, 0.42);
+    --inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --shadow-button: 0 1px 2px rgba(0, 0, 0, 0.25), 0 6px 14px rgba(47, 158, 151, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --shadow-button-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(47, 158, 151, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --shadow-button-active: inset 0 1px 3px rgba(0, 0, 0, 0.35);
 
-  --app-bg: radial-gradient(125% 95% at 50% 34%, #12312e 0%, #0d2523 55%, #081a19 100%);
-  --petal-grad: linear-gradient(160deg, rgba(120, 180, 172, 0.42), rgba(70, 120, 114, 0.18));
-  --petal-vein: linear-gradient(rgba(160, 215, 205, 0.36), rgba(160, 215, 205, 0));
-  --gem-grad: linear-gradient(135deg, #d9fff9, #5fd6cb 42%, #1f8c83 84%);
-  --gem-shadow: 0 0 16px rgba(95, 214, 203, 0.7);
-  --sparkle: rgba(190, 240, 232, 0.95);
-  --sparkle-core: #eafffb;
-  --sparkle-core-glow: rgba(150, 230, 218, 0.85);
+    --app-bg: radial-gradient(125% 95% at 50% 34%, #12312e 0%, #0d2523 55%, #081a19 100%);
+    --petal-grad: linear-gradient(160deg, rgba(120, 180, 172, 0.42), rgba(70, 120, 114, 0.18));
+    --petal-vein: linear-gradient(rgba(160, 215, 205, 0.36), rgba(160, 215, 205, 0));
+    --gem-grad: linear-gradient(135deg, #d9fff9, #5fd6cb 42%, #1f8c83 84%);
+    --gem-shadow: 0 0 16px rgba(95, 214, 203, 0.7);
+    --sparkle: rgba(190, 240, 232, 0.95);
+    --sparkle-core: #eafffb;
+    --sparkle-core-glow: rgba(150, 230, 218, 0.85);
+  }
 }
 
 :root[data-theme="dark"] {

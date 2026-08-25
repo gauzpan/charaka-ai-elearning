@@ -11,8 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "A workflow-first AI-literacy coach for healthcare professionals.",
     start_url: "/today",
     display: "standalone",
-    background_color: "#081a19",
-    theme_color: "#081a19",
+    background_color: "#f4f6f8",
+    theme_color: "#f4f6f8",
     orientation: "portrait",
     // Both purposes per size: "any" for the general icon slot, "maskable" for
     // adaptive launchers (the emblem sits inside the safe zone on a solid canvas).
