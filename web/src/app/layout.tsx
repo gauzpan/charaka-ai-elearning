@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f4f6f8",
+  themeColor: "#081a19",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -62,7 +62,8 @@ export const viewport: Viewport = {
 };
 
 // Applies the persisted theme before first paint so there's no flash. When no
-// explicit choice is stored, data-theme stays unset and CSS follows the device.
+// explicit choice is stored, data-theme stays unset and CSS defaults to dark
+// (the product default) regardless of device preference.
 const themeScript = `try{var t=localStorage.getItem('charaka.theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

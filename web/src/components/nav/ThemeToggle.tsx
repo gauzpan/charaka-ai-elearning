@@ -2,10 +2,11 @@
 
 import { useSyncExternalStore } from "react";
 
-// Light/dark control. Default follows the device (prefers-color-scheme, handled
-// in CSS); a tap sets an explicit choice on <html data-theme> and persists it.
-// Read via useSyncExternalStore so SSR renders a stable value and the client
-// swaps to the resolved theme without a hydration-mismatch warning.
+// Light/dark control. Default is dark (the product default — design.md's
+// dark palette), regardless of device preference; a tap sets an explicit
+// choice on <html data-theme> and persists it. Read via useSyncExternalStore
+// so SSR renders a stable value and the client swaps to the resolved theme
+// without a hydration-mismatch warning.
 
 const STORAGE_KEY = "charaka.theme";
 type Theme = "light" | "dark";
@@ -21,24 +22,16 @@ function stored(): Theme | null {
   }
 }
 
-function systemTheme(): Theme {
-  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
 function resolved(): Theme {
-  return stored() ?? systemTheme();
+  return stored() ?? "dark";
 }
 
 function subscribe(listener: () => void): () => void {
   listeners.add(listener);
-  const mq = window.matchMedia?.("(prefers-color-scheme: dark)");
-  const onChange = () => listener();
-  mq?.addEventListener?.("change", onChange);
-  window.addEventListener("storage", onChange);
+  window.addEventListener("storage", listener);
   return () => {
     listeners.delete(listener);
-    mq?.removeEventListener?.("change", onChange);
-    window.removeEventListener("storage", onChange);
+    window.removeEventListener("storage", listener);
   };
 }
 
@@ -70,7 +63,7 @@ function MoonIcon() {
 }
 
 export function ThemeToggle() {
-  const theme = useSyncExternalStore(subscribe, resolved, () => "light" as Theme);
+  const theme = useSyncExternalStore(subscribe, resolved, () => "dark" as Theme);
   const isDark = theme === "dark";
 
   return (
