@@ -2,6 +2,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getUserIdOrNull } from "@/lib/auth";
 import { allLessons } from "@/content/modules";
+import { track } from "@/lib/mixpanel";
 
 // Account-backed progress (build-plan Phase 7). The client store (localStorage)
 // syncs against this so progress and skill points follow the user across
@@ -58,12 +59,20 @@ export async function POST(req: Request) {
   });
   const nextCardIndex = Math.max(existing?.cardIndex ?? 0, cardIndex);
   const completedAt = existing?.completedAt ?? (completed ? new Date() : null);
+  // Mixpanel Value Moment: fires exactly once per (user, lesson) — the
+  // transition from not-yet-completed to completed, not on every progress
+  // upsert (a lesson already completed can still receive card-index updates).
+  const justCompleted = !existing?.completedAt && completedAt !== null;
 
   await prisma.progress.upsert({
     where: { userId_lessonId: { userId, lessonId } },
     update: { cardIndex: nextCardIndex, completedAt },
     create: { userId, moduleId, lessonId, cardIndex: nextCardIndex, completedAt },
   });
+
+  if (justCompleted) {
+    track(userId, "lesson_completed", { module_id: moduleId, lesson_id: lessonId, platform: "web" });
+  }
 
   return Response.json({ ok: true });
 }

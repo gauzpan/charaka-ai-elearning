@@ -8,6 +8,7 @@ import {
   SESSION_MAX_AGE,
   MAX_CODE_ATTEMPTS,
 } from "@/lib/auth";
+import { track, setProfile } from "@/lib/mixpanel";
 
 // Consume a login code, set the session cookie, and tell the client where to
 // go next. Attempts are capped per outstanding code (see MagicLinkToken.attempts)
@@ -52,10 +53,26 @@ export async function POST(req: Request) {
     return invalid();
   }
 
+  // Mixpanel "account_created" fires once, on this user's first-ever
+  // successful verification — checked before marking this token consumed,
+  // so this record doesn't count itself. Passwordless flow has no separate
+  // signup form: account creation (upsert) already happened silently at
+  // /api/auth/request; this is the first moment there's an identifiable,
+  // signed-in user, so it's the accurate analog of "sign_up_completed".
+  const priorSuccessfulLogins = await prisma.magicLinkToken.count({
+    where: { userId: user.id, consumedAt: { not: null } },
+  });
+  const isNewAccount = priorSuccessfulLogins === 0;
+
   await prisma.magicLinkToken.update({
     where: { id: record.id },
     data: { consumedAt: new Date() },
   });
+
+  if (isNewAccount) {
+    setProfile(user.id, { $email: user.email, platform: "web" });
+    track(user.id, "account_created", { platform: "web", sign_up_method: "email_code" });
+  }
 
   const res = NextResponse.json({
     ok: true,
