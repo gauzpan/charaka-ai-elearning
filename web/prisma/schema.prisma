@@ -22,8 +22,13 @@ enum Role {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  email       String   @unique
+  id       String  @id @default(cuid())
+  // Nullable so a Google login without a verified email doesn't fail account
+  // creation; still unique — Postgres allows multiple NULLs under a unique
+  // constraint. The email-code flow always populates this on upsert.
+  email    String? @unique
+  // Set once a Google OAuth login has verified this account's identity.
+  googleId String? @unique
   role        Role     @default(PHYSICIAN)
   studyWindow String? // "commute" | "break" | "evening" — set in onboarding (M4)
   focusTask   String? // the task they want to get better at (onboarding)
@@ -35,27 +40,26 @@ model User {
 
   createdAt DateTime @default(now())
 
-  magicLinkTokens MagicLinkToken[]
-  progress        Progress[]
-  savedPrompts    SavedPrompt[]
-  applyIntents    ApplyIntent[]
-  savedTools      SavedTool[]
+  loginCodes   LoginCode[]
+  progress     Progress[]
+  savedPrompts SavedPrompt[]
+  applyIntents ApplyIntent[]
+  savedTools   SavedTool[]
 }
 
-// Sign-in via a one-time numeric code, emailed to the user (model name kept
-// for migration continuity — it stores a hashed login code, not a link URL).
-model MagicLinkToken {
-  id        String    @id @default(cuid())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  tokenHash String    @unique
-  expiresAt DateTime
+// Sign-in via a one-time numeric code, emailed to the user.
+model LoginCode {
+  id         String    @id @default(cuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
   consumedAt DateTime?
   // Failed verification attempts against this code. Capped in application
-  // code (MAX_CODE_ATTEMPTS) — a 6-digit code has far less entropy than the
-  // old 32-byte token, so this is what keeps it from being brute-forceable
+  // code (MAX_CODE_ATTEMPTS) — a 6-digit code has far less entropy than a
+  // long random token, so this is what keeps it from being brute-forceable
   // within its short TTL.
-  attempts  Int       @default(0)
+  attempts   Int       @default(0)
 
   createdAt DateTime @default(now())
 

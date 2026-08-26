@@ -4,14 +4,15 @@ import { redirect } from "next/navigation";
 import { createHash, createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 
-// Lightweight session (build-plan Phase 7). No third-party auth lib — sign-in
-// is a one-time numeric code emailed to the user; the MagicLinkToken table +
-// a signed HttpOnly cookie carry the session. AUTH_SECRET signs the cookie;
-// codes are stored only as SHA-256 hashes, never in plaintext.
+// Lightweight session. No third-party auth lib — sign-in is a one-time code
+// emailed to the user, or Google OAuth; a signed HttpOnly cookie carries the
+// session. AUTH_SECRET signs both the session cookie and the short-lived
+// ceremony cookies below.
 
 export const SESSION_COOKIE = "charaka_session";
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-const TOKEN_TTL_MS = 10 * 60 * 1000; // login code valid 10 minutes
+const LOGIN_CODE_TTL_MS = 10 * 60 * 1000; // login code valid 10 minutes
+export const TOKEN_TTL = LOGIN_CODE_TTL_MS;
 export const MAX_CODE_ATTEMPTS = 5;
 
 function secret(): string {
@@ -78,7 +79,61 @@ export async function getSessionUserId(): Promise<string | null> {
   return userId;
 }
 
-export const TOKEN_TTL = TOKEN_TTL_MS;
+// --- short-lived ceremony cookies ------------------------------------------
+// The Google OAuth redirect needs a small piece of server-issued state (a
+// CSRF state token) to survive one client round trip. Rather than a DB
+// table, that state rides in its own signed, httpOnly, short-TTL cookie —
+// same HMAC scheme as the session cookie, with the expiry embedded in the
+// payload.
+
+export async function setCeremonyCookie(
+  name: string,
+  payload: Record<string, string>,
+  maxAgeSeconds: number,
+): Promise<void> {
+  const body = JSON.stringify({ ...payload, exp: Date.now() + maxAgeSeconds * 1000 });
+  const value = `${Buffer.from(body).toString("base64url")}.${sign(body)}`;
+  const store = await cookies();
+  store.set(name, value, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: maxAgeSeconds,
+  });
+}
+
+/** Reads and clears a ceremony cookie. Returns null if missing, tampered, or expired. */
+export async function consumeCeremonyCookie<T extends Record<string, string>>(
+  name: string,
+): Promise<T | null> {
+  const store = await cookies();
+  const raw = store.get(name)?.value;
+  store.delete(name);
+  if (!raw) return null;
+  const dot = raw.lastIndexOf(".");
+  if (dot < 0) return null;
+  const encoded = raw.slice(0, dot);
+  const sig = raw.slice(dot + 1);
+  let body: string;
+  try {
+    body = Buffer.from(encoded, "base64url").toString("utf8");
+  } catch {
+    return null;
+  }
+  const expected = sign(body);
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  let payload: (T & { exp: number }) | null = null;
+  try {
+    payload = JSON.parse(body);
+  } catch {
+    return null;
+  }
+  if (!payload || typeof payload.exp !== "number" || Date.now() > payload.exp) return null;
+  return payload;
+}
 
 // --- guards ---------------------------------------------------------------
 
@@ -88,7 +143,10 @@ export async function requireUser() {
   if (!userId) redirect("/signin");
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
-    await destroySession();
+    // Can't mutate cookies from a Server Component render (only Server
+    // Actions/Route Handlers may), so the stale cookie is left in place —
+    // it just keeps failing this same lookup until the next successful
+    // sign-in overwrites it via createSession().
     redirect("/signin");
   }
   return user;

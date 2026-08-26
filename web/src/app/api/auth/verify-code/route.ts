@@ -3,15 +3,13 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
   verifyCodeHash,
-  buildSessionValue,
-  SESSION_COOKIE,
-  SESSION_MAX_AGE,
+  createSession,
   MAX_CODE_ATTEMPTS,
 } from "@/lib/auth";
 import { track, setProfile } from "@/lib/mixpanel";
 
 // Consume a login code, set the session cookie, and tell the client where to
-// go next. Attempts are capped per outstanding code (see MagicLinkToken.attempts)
+// go next. Attempts are capped per outstanding code (see LoginCode.attempts)
 // so a 6-digit code can't be brute-forced within its 10-minute TTL.
 export const runtime = "nodejs";
 
@@ -39,14 +37,14 @@ export async function POST(req: Request) {
 
   // Most recent outstanding code for this user — never look up by guessing
   // the hash directly, or there'd be nothing to rate-limit attempts against.
-  const record = await prisma.magicLinkToken.findFirst({
+  const record = await prisma.loginCode.findFirst({
     where: { userId: user.id, consumedAt: null, expiresAt: { gt: new Date() } },
     orderBy: { createdAt: "desc" },
   });
   if (!record || record.attempts >= MAX_CODE_ATTEMPTS) return invalid();
 
   if (!verifyCodeHash(parsed.data.code, record.tokenHash)) {
-    await prisma.magicLinkToken.update({
+    await prisma.loginCode.update({
       where: { id: record.id },
       data: { attempts: { increment: 1 } },
     });
@@ -59,12 +57,12 @@ export async function POST(req: Request) {
   // signup form: account creation (upsert) already happened silently at
   // /api/auth/request; this is the first moment there's an identifiable,
   // signed-in user, so it's the accurate analog of "sign_up_completed".
-  const priorSuccessfulLogins = await prisma.magicLinkToken.count({
+  const priorSuccessfulLogins = await prisma.loginCode.count({
     where: { userId: user.id, consumedAt: { not: null } },
   });
   const isNewAccount = priorSuccessfulLogins === 0;
 
-  await prisma.magicLinkToken.update({
+  await prisma.loginCode.update({
     where: { id: record.id },
     data: { consumedAt: new Date() },
   });
@@ -73,21 +71,15 @@ export async function POST(req: Request) {
   // in before Mixpanel was wired up (or on any return visit) would never get
   // their email captured in their Mixpanel profile. people.set() is
   // idempotent, so re-sending the same value on every login is harmless.
-  setProfile(user.id, { $email: user.email, platform: "web" });
+  setProfile(user.id, { $email: user.email ?? "", platform: "web" });
   if (isNewAccount) {
     track(user.id, "account_created", { platform: "web", sign_up_method: "email_code" });
   }
 
-  const res = NextResponse.json({
+  await createSession(user.id);
+
+  return NextResponse.json({
     ok: true,
     redirect: user.onboardedAt ? "/today" : "/onboarding",
   });
-  res.cookies.set(SESSION_COOKIE, buildSessionValue(user.id), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: SESSION_MAX_AGE,
-  });
-  return res;
 }

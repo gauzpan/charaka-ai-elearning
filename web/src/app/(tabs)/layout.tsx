@@ -29,8 +29,8 @@ export default async function TabsLayout({ children }: { children: React.ReactNo
             <ThemeToggle />
             <Link
               href="/progress"
-              aria-label={`Signed in as ${user.email}`}
-              title={user.email}
+              aria-label={user.email ? `Signed in as ${user.email}` : "Your profile"}
+              title={user.email ?? undefined}
               className="grid h-9 w-9 shrink-0 place-items-center rounded-pill border bg-subtle font-mono text-[12px] font-semibold uppercase text-secondary hover:text-primary"
             >
               {initials}
