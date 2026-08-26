@@ -10,6 +10,7 @@ import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { cn } from "@/lib/cn";
 import { modules, lockedModules, getLesson } from "@/content/modules";
 import { useProgress, type LessonStatus } from "@/lib/useProgress";
+import { trackLockedModuleClicked } from "@/lib/analyticsClient";
 import type { Module } from "@/content/types";
 
 function StatusDot({ status }: { status: LessonStatus }) {
@@ -70,7 +71,7 @@ function ModuleCard({ module, statusOf }: { module: Module; statusOf: (id: strin
   return (
     <Card variant="elevated" className="flex flex-col gap-2">
       <div className="flex flex-col gap-0.5">
-        <h2 className="text-[18px] font-semibold leading-[24px] text-primary">{module.title}</h2>
+        <h2 className="font-sans text-[18px] font-semibold leading-[24px] text-primary">{module.title}</h2>
         <p className="text-[14px] leading-[20px] text-secondary">{module.subtitle}</p>
       </div>
       <div className="divide-y">
@@ -128,7 +129,17 @@ function JourneyContent() {
       <div className="flex flex-col gap-3">
         <Eyebrow>Coming next</Eyebrow>
         {lockedModules.map((m) => (
-          <Card key={m.id} variant="subtle" className="flex items-center justify-between gap-3">
+          <Card
+            key={m.id}
+            variant="subtle"
+            className="flex items-center justify-between gap-3 cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onClick={() => trackLockedModuleClicked(m.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") trackLockedModuleClicked(m.id);
+            }}
+          >
             <div className="flex flex-col gap-0.5">
               <h3 className="font-medium text-primary">{m.title}</h3>
               <p className="text-[14px] leading-[20px] text-secondary">{m.why}</p>

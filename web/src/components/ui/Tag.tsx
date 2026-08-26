@@ -13,13 +13,13 @@ const tones: Record<Tone, string> = {
 
 /**
  * Meta label / status chip (design.md §7): pastel-semantic, uppercase,
- * 12px mono, pill radius. Color carries meaning only.
+ * 12px UI sans, pill radius. Color carries meaning only.
  */
 export function Tag({ tone = "neutral", children }: { tone?: Tone; children: ReactNode }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-pill px-2.5 py-1 font-mono text-[12px] font-medium uppercase tracking-[0.05em] leading-none",
+        "inline-flex items-center rounded-pill px-2.5 py-1 font-sans text-[12px] font-medium uppercase tracking-[0.05em] leading-none",
         tones[tone],
       )}
     >

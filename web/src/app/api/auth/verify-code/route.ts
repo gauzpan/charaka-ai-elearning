@@ -7,6 +7,7 @@ import {
   MAX_CODE_ATTEMPTS,
 } from "@/lib/auth";
 import { track, setProfile } from "@/lib/mixpanel";
+import { trackAuthCodeVerified, trackUserSignedIn } from "@/lib/analytics";
 
 // Consume a login code, set the session cookie, and tell the client where to
 // go next. Attempts are capped per outstanding code (see LoginCode.attempts)
@@ -75,6 +76,18 @@ export async function POST(req: Request) {
   if (isNewAccount) {
     track(user.id, "account_created", { platform: "web", sign_up_method: "email_code" });
   }
+  trackAuthCodeVerified({
+    userId: user.id,
+    userAgent: req.headers.get("user-agent"),
+    userRole: user.role,
+    isFirstLogin: isNewAccount,
+  });
+  trackUserSignedIn({
+    userId: user.id,
+    userAgent: req.headers.get("user-agent"),
+    userRole: user.role,
+    method: "email_code",
+  });
 
   await createSession(user.id);
 

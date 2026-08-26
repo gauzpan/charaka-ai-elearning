@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getUserIdOrNull } from "@/lib/auth";
+import { trackOnboardingCompleted } from "@/lib/analytics";
 
 export const runtime = "nodejs";
 
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(raw);
   if (!parsed.success) return Response.json({ error: "invalid_request" }, { status: 400 });
 
-  await prisma.user.update({
+  const user = await prisma.user.update({
     where: { id: userId },
     data: {
       focusTask: parsed.data.focusTask,
@@ -30,5 +31,14 @@ export async function POST(req: Request) {
       onboardedAt: new Date(),
     },
   });
+
+  trackOnboardingCompleted({
+    userId,
+    userAgent: req.headers.get("user-agent"),
+    userRole: user.role,
+    focusTaskSelected: parsed.data.focusTask,
+    studyWindowTime: parsed.data.studyWindow,
+  });
+
   return Response.json({ ok: true });
 }

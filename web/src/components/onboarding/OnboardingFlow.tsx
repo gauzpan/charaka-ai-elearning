@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
@@ -8,6 +8,7 @@ import { Button, buttonClasses } from "@/components/ui/Button";
 import { StepBar } from "@/components/ui/StepBar";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { cn } from "@/lib/cn";
+import { trackOnboardingStarted } from "@/lib/analyticsClient";
 
 // 90-second onboarding (design.md §5.1): role is fixed (physician), so we ask
 // what they want to get better at and when they learn — then hand them a real
@@ -33,6 +34,14 @@ export function OnboardingFlow() {
   const [task, setTask] = useState<string | null>(null);
   const [win, setWin] = useState<"commute" | "break" | "evening" | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // This flow is only ever reached one way today: authed-but-not-onboarded
+  // users are redirected here straight after their first sign-in (see
+  // src/app/onboarding/page.tsx) — so "post_signup" is the only real
+  // entry_point until there's more than one way to land on /onboarding.
+  useEffect(() => {
+    trackOnboardingStarted("post_signup");
+  }, []);
 
   async function finish(nextWin: "commute" | "break" | "evening") {
     setSaving(true);
@@ -123,7 +132,7 @@ export function OnboardingFlow() {
           </Card>
           <button
             onClick={() => router.push("/today")}
-            className="font-mono text-[12px] font-medium text-secondary hover:text-primary"
+            className="font-sans text-[12px] font-medium text-secondary hover:text-primary"
           >
             Skip to Today
           </button>

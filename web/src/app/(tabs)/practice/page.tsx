@@ -108,7 +108,7 @@ export default function PracticePage() {
                   setPrompts(null);
                   setReloadKey((k) => k + 1);
                 }}
-                className="self-start font-mono text-[12px] text-action hover:text-action-hover"
+                className="self-start font-sans text-[12px] text-action hover:text-action-hover"
               >
                 Retry
               </button>
@@ -183,7 +183,7 @@ function SavedPromptItem({ p }: { p: SavedPrompt }) {
             type="button"
             onClick={copy}
             className={cn(
-              "inline-flex items-center gap-1.5 font-mono text-[12px] transition-colors",
+              "inline-flex items-center gap-1.5 font-sans text-[12px] transition-colors",
               copied ? "text-success" : "text-secondary hover:text-primary",
             )}
           >
@@ -210,7 +210,7 @@ function SavedPromptItem({ p }: { p: SavedPrompt }) {
           <button
             type="button"
             onClick={() => setExpanded((e) => !e)}
-            className="font-mono text-[12px] text-action hover:text-action-hover"
+            className="font-sans text-[12px] text-action hover:text-action-hover"
           >
             {expanded ? "Show less" : "Show more"}
           </button>

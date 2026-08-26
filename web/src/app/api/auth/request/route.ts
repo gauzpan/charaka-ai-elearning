@@ -2,6 +2,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { generateCode, hashToken, TOKEN_TTL } from "@/lib/auth";
 import { sendLoginCodeEmail, emailDeliveryEnabled } from "@/lib/email";
+import { trackAuthCodeRequested } from "@/lib/analytics";
 
 // Request a sign-in code, emailed via Resend. Without RESEND_API_KEY set
 // (local dev, CI), the code is logged to the console and echoed in the
@@ -44,6 +45,13 @@ export async function POST(req: Request) {
     console.error("[auth] failed to send login code", err);
     return Response.json({ error: "send_failed" }, { status: 502 });
   }
+
+  trackAuthCodeRequested({
+    userId: user.id,
+    userAgent: req.headers.get("user-agent"),
+    userRole: user.role,
+    userEmailDomain: email.split("@")[1] ?? "unknown",
+  });
 
   const showDevCode = !emailDeliveryEnabled() && process.env.NODE_ENV !== "production";
   return Response.json({ ok: true, ...(showDevCode ? { devCode: code } : {}) });

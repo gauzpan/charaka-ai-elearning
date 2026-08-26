@@ -87,7 +87,7 @@ export default function ToolkitPage() {
     <div className="flex min-h-full flex-col gap-6 animate-card-in">
       <Link
         href="/resources"
-        className="inline-flex items-center gap-1.5 font-mono text-[12px] font-medium uppercase tracking-[0.06em] text-secondary hover:text-primary"
+        className="inline-flex items-center gap-1.5 font-sans text-[12px] font-medium uppercase tracking-[0.06em] text-secondary hover:text-primary"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M15 18l-6-6 6-6" />
@@ -203,7 +203,7 @@ function FilterMenu({
         aria-expanded={open}
         className={cn(
           "flex h-11 w-full items-center justify-between gap-2 rounded-md border border-default bg-surface pl-3.5 pr-3",
-          "font-mono text-[12px] font-medium uppercase tracking-[0.06em] transition-colors",
+          "font-sans text-[12px] font-medium uppercase tracking-[0.06em] transition-colors",
           "hover:border-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
         )}
       >
@@ -242,7 +242,7 @@ function FilterMenu({
                   }}
                   className={cn(
                     "flex min-h-11 w-full items-center justify-between gap-2 px-3.5 py-2 text-left",
-                    "font-mono text-[12px] font-medium uppercase tracking-[0.06em] transition-colors",
+                    "font-sans text-[12px] font-medium uppercase tracking-[0.06em] transition-colors",
                     selected ? "text-action" : "text-secondary hover:bg-subtle hover:text-primary",
                   )}
                 >
@@ -282,7 +282,7 @@ function ToolItem({
       {/* Line 1: lettermark + name + bookmark */}
       <div className="flex items-center gap-3">
         <span
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-pill bg-subtle font-mono text-[13px] font-semibold uppercase text-secondary"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-pill bg-subtle font-sans text-[13px] font-semibold uppercase text-secondary"
           aria-hidden
         >
           {tool.mark}
@@ -322,7 +322,7 @@ function ToolItem({
         href={tool.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 self-start font-mono text-[13px] font-medium text-action hover:text-action-hover"
+        className="inline-flex items-center gap-1.5 self-start font-sans text-[13px] font-medium text-action hover:text-action-hover"
       >
         Visit official website
         <span aria-hidden>↗</span>

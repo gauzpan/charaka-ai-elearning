@@ -1,6 +1,9 @@
 import OpenAI from "openai";
 import { z } from "zod";
 import { getPracticeContext } from "@/lib/practiceContext";
+import { getUserIdOrNull } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { trackSandboxPromptSubmitted } from "@/lib/analytics";
 
 // The hypothesis-critical practice loop (build-plan Phase 6). Server-side only:
 // the OpenRouter key never reaches the browser. Injects a SYNTHETIC abstract +
@@ -46,6 +49,20 @@ export async function POST(req: Request) {
   if (!ctx) {
     return Response.json({ error: "unknown_task" }, { status: 404 });
   }
+
+  // Fire where the call genuinely "initiates" from the backend's view — no
+  // auth is required to use the sandbox API itself, so this degrades to an
+  // "anonymous" distinct_id rather than gating the route just for analytics.
+  const userId = await getUserIdOrNull();
+  const user = userId
+    ? await prisma.user.findUnique({ where: { id: userId }, select: { role: true } })
+    : null;
+  trackSandboxPromptSubmitted({
+    userId: userId ?? "anonymous",
+    userAgent: req.headers.get("user-agent"),
+    userRole: user?.role,
+    lessonId: parsed.data.taskId,
+  });
 
   const client = new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",

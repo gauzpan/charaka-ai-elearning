@@ -94,7 +94,7 @@ export function TabBar() {
                 )}
               >
                 <Icon />
-                <span className="font-mono text-[11px] uppercase tracking-[0.04em] leading-none">
+                <span className="font-sans text-[11px] uppercase tracking-[0.04em] leading-none">
                   {label}
                 </span>
               </Link>

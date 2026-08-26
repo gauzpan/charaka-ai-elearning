@@ -44,8 +44,8 @@ export default async function MetricsPage() {
   return (
     <div className="mx-auto flex min-h-dvh max-w-[640px] flex-col gap-6 px-5 py-8">
       <div className="flex flex-col gap-1">
-        <p className="font-mono text-[12px] uppercase tracking-wide text-muted">Internal · Metrics</p>
-        <h1 className="text-2xl text-primary">Success signals</h1>
+        <p className="font-sans text-[12px] uppercase tracking-wide text-muted">Internal · Metrics</p>
+        <h1 className="text-h1 text-primary">Success signals</h1>
         <p className="text-secondary">
           The two capability signals we optimize for — real-world use, not screen time.
         </p>
@@ -58,7 +58,7 @@ export default async function MetricsPage() {
             <span className="font-display text-4xl text-primary">
               {m.value.toLocaleString()}
             </span>
-            <span className="font-mono text-[12px] uppercase tracking-wide text-muted">
+            <span className="font-sans text-[12px] uppercase tracking-wide text-muted">
               {m.unit} · {m.users.toLocaleString()}{" "}
               {m.users === 1 ? "user" : "users"}
             </span>
@@ -74,7 +74,7 @@ export default async function MetricsPage() {
         </span>
       </Card>
 
-      <Link href="/today" className="font-mono text-[12px] text-action hover:text-action-hover">
+      <Link href="/today" className="font-sans text-[12px] text-action hover:text-action-hover">
         Back to Today
       </Link>
     </div>

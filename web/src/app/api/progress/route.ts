@@ -2,7 +2,12 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getUserIdOrNull } from "@/lib/auth";
 import { allLessons } from "@/content/modules";
-import { track } from "@/lib/mixpanel";
+import { POINTS_PER_LESSON, levelFor } from "@/lib/levels";
+import {
+  trackLessonCompleted,
+  trackFirstLessonCompleted,
+  trackLevelUpgraded,
+} from "@/lib/analytics";
 
 // Account-backed progress (build-plan Phase 7). The client store (localStorage)
 // syncs against this so progress and skill points follow the user across
@@ -35,6 +40,9 @@ const Body = z.object({
   lessonId: z.string().min(1),
   cardIndex: z.number().int().min(0).max(50).optional(),
   completed: z.boolean().optional(),
+  // Client-timed (LessonPlayer captures a mount timestamp) — used only for
+  // the first_lesson_completed analytics event, never persisted to Progress.
+  timeTakenSeconds: z.number().int().min(0).optional(),
 });
 
 export async function POST(req: Request) {
@@ -50,7 +58,7 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(raw);
   if (!parsed.success) return Response.json({ error: "invalid_request" }, { status: 400 });
 
-  const { lessonId, cardIndex = 0, completed = false } = parsed.data;
+  const { lessonId, cardIndex = 0, completed = false, timeTakenSeconds } = parsed.data;
   const moduleId = moduleIdFor(lessonId);
   if (!moduleId) return Response.json({ error: "unknown_lesson" }, { status: 404 });
 
@@ -64,6 +72,12 @@ export async function POST(req: Request) {
   // upsert (a lesson already completed can still receive card-index updates).
   const justCompleted = !existing?.completedAt && completedAt !== null;
 
+  // Completed-lesson count BEFORE this write — used to derive points/level
+  // before vs. after, and whether this is the user's first-ever completion.
+  const completedCountBefore = await prisma.progress.count({
+    where: { userId, completedAt: { not: null } },
+  });
+
   await prisma.progress.upsert({
     where: { userId_lessonId: { userId, lessonId } },
     update: { cardIndex: nextCardIndex, completedAt },
@@ -71,7 +85,47 @@ export async function POST(req: Request) {
   });
 
   if (justCompleted) {
-    track(userId, "lesson_completed", { module_id: moduleId, lesson_id: lessonId, platform: "web" });
+    const userAgent = req.headers.get("user-agent");
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    const userRole = user?.role;
+
+    const pointsBefore = completedCountBefore * POINTS_PER_LESSON;
+    const pointsAfter = pointsBefore + POINTS_PER_LESSON;
+
+    trackLessonCompleted({
+      userId,
+      userAgent,
+      userRole,
+      lessonId,
+      moduleId,
+      pointsEarned: POINTS_PER_LESSON,
+    });
+
+    if (completedCountBefore === 0) {
+      trackFirstLessonCompleted({
+        userId,
+        userAgent,
+        userRole,
+        lessonId,
+        timeTakenSeconds: timeTakenSeconds ?? 0,
+      });
+    }
+
+    // DB is the source of truth for level rank (design.md §5.6 competence
+    // framing) — computed here, not duplicated client-side, so a rank
+    // transition only ever fires once regardless of how many devices/tabs
+    // are syncing this same completion.
+    const levelBefore = levelFor(pointsBefore);
+    const levelAfter = levelFor(pointsAfter);
+    if (levelAfter.name !== levelBefore.name) {
+      trackLevelUpgraded({
+        userId,
+        userAgent,
+        userRole,
+        newLevel: levelAfter.name,
+        totalPoints: pointsAfter,
+      });
+    }
   }
 
   return Response.json({ ok: true });

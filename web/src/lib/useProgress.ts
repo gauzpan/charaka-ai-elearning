@@ -2,6 +2,12 @@
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { allLessons } from "@/content/modules";
+import { POINTS_PER_LESSON, LEVELS, levelFor, type LevelInfo } from "@/lib/levels";
+
+// Re-exported for existing call sites (e.g. LessonPlayer.tsx) that import
+// these from this module — the actual definitions now live in lib/levels.ts
+// so server code (analytics, /api/progress) can share them too.
+export { POINTS_PER_LESSON, LEVELS, levelFor, type LevelInfo };
 
 // M2 persists progress client-side (localStorage) — offline-first (design.md §9)
 // and no throwaway auth plumbing before real accounts land in M4, which will
@@ -35,35 +41,6 @@ const SERVER_SNAPSHOT: ProgressState = {
 };
 
 export type LessonStatus = "completed" | "current" | "upcoming" | "locked";
-
-// Skill points are the recurring signal (design.md §3.4 "skill points as
-// experience signal"), replacing the streak. Earned by doing; an experience
-// level is derived from the accumulated total (§5.6 — competence framing).
-export const POINTS_PER_LESSON = 100;
-
-export const LEVELS = [
-  { name: "Learner", min: 0 },
-  { name: "Enabled", min: 100 },
-  { name: "Proficient", min: 250 },
-  { name: "Expert", min: 400 },
-] as const;
-
-export interface LevelInfo {
-  name: string;
-  min: number;
-  /** Points needed to reach the next tier, or null at the top level. */
-  next: number | null;
-}
-
-export function levelFor(points: number): LevelInfo {
-  let idx = 0;
-  for (let i = 0; i < LEVELS.length; i++) {
-    if (points >= LEVELS[i].min) idx = i;
-  }
-  const current = LEVELS[idx];
-  const next = idx < LEVELS.length - 1 ? LEVELS[idx + 1].min : null;
-  return { name: current.name, min: current.min, next };
-}
 
 function countCompleted(lessons: Record<string, LessonState>): number {
   return Object.values(lessons).filter((l) => l.completedAt).length;
@@ -160,11 +137,16 @@ async function pullAndMerge() {
   }
 }
 
-function pushLesson(lessonId: string, cardIndex: number, completed: boolean) {
+function pushLesson(
+  lessonId: string,
+  cardIndex: number,
+  completed: boolean,
+  timeTakenSeconds?: number,
+) {
   fetch("/api/progress", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ lessonId, cardIndex, completed }),
+    body: JSON.stringify({ lessonId, cardIndex, completed, timeTakenSeconds }),
   }).catch(() => {
     // best-effort; the local cache still holds the change
   });
@@ -197,7 +179,7 @@ export function useProgress() {
     pushLesson(lessonId, nextIndex, Boolean(existing.completedAt));
   }, []);
 
-  const completeLesson = useCallback((lessonId: string) => {
+  const completeLesson = useCallback((lessonId: string, timeTakenSeconds?: number) => {
     const prev = cache;
     const existing = prev.lessons[lessonId] ?? { cardIndex: 0, completedAt: null };
     // Award points only on first completion — re-finishing never re-awards.
@@ -210,7 +192,7 @@ export function useProgress() {
       },
       skillPoints: prev.skillPoints + (firstCompletion ? POINTS_PER_LESSON : 0),
     });
-    pushLesson(lessonId, existing.cardIndex, true);
+    pushLesson(lessonId, existing.cardIndex, true, timeTakenSeconds);
   }, []);
 
   const isCompleted = useCallback(

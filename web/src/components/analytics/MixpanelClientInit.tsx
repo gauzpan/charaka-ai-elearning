@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { initMixpanelClient, mixpanel } from "@/lib/mixpanelClient";
+import { registerAnalyticsSuperProps } from "@/lib/analyticsClient";
 
 // Mounted once in the root layout, mirrors ServiceWorkerRegister's pattern:
 // a browser-only side effect with no UI. Initializes autocapture + Session
@@ -16,9 +17,10 @@ export function MixpanelClientInit() {
     let cancelled = false;
     fetch("/api/me")
       .then((r) => r.json())
-      .then((data: { id?: string }) => {
+      .then((data: { id?: string; role?: string }) => {
         if (cancelled || !data.id) return;
         mixpanel.identify(data.id);
+        registerAnalyticsSuperProps(data.role ?? null);
       })
       .catch(() => {
         // identity is best-effort — anonymous autocapture/replay still works

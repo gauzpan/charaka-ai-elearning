@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { exchangeGoogleCode } from "@/lib/google";
 import { consumeCeremonyCookie, createSession } from "@/lib/auth";
 import { track, setProfile } from "@/lib/mixpanel";
+import { trackUserSignedIn } from "@/lib/analytics";
 
 export const runtime = "nodejs";
 
@@ -68,6 +69,12 @@ export async function GET(req: Request) {
   if (isNewAccount) {
     track(user.id, "account_created", { platform: "web", sign_up_method: "google" });
   }
+  trackUserSignedIn({
+    userId: user.id,
+    userAgent: req.headers.get("user-agent"),
+    userRole: user.role,
+    method: "google",
+  });
 
   const dest = new URL(user.onboardedAt ? "/today" : "/onboarding", url);
   return NextResponse.redirect(dest);

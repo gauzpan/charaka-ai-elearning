@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TryItCard } from "@/content/types";
 import { Tag } from "@/components/ui/Tag";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button, buttonClasses } from "@/components/ui/Button";
 import { Markdown } from "@/components/ui/Markdown";
 import { evaluatePrompt } from "@/lib/rubric";
+import { trackSandboxRubricEvaluated } from "@/lib/analyticsClient";
 import { cn } from "@/lib/cn";
 
 // The Try-it sandbox (build-plan Phase 6): edit a prompt, get real model output
@@ -23,6 +24,14 @@ export function SandboxConsole({ card }: { card: TryItCard }) {
   const [saved, setSaved] = useState(false);
 
   const rubric = useMemo(() => evaluatePrompt(prompt), [prompt]);
+
+  // Fires once per distinct score value, not on every keystroke — the
+  // dependency is rubric.score specifically (not `rubric` or `prompt`), so
+  // an edit that doesn't change the score doesn't re-fire.
+  useEffect(() => {
+    trackSandboxRubricEvaluated(card.taskId, rubric.score);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rubric.score]);
 
   async function run() {
     setStatus("running");

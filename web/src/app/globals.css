@@ -195,7 +195,7 @@
 
   /* fonts (variables provided by next/font in layout.tsx) */
   --font-display: var(--font-space-grotesk), system-ui, sans-serif;
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-sans: var(--font-plus-jakarta-sans), "SF Pro Display", system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
 
@@ -212,12 +212,20 @@ body {
   background: var(--bg-canvas);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  line-height: 1.6;
+  /* 1.5 = WCAG's minimum recommended body line-height (SC 1.4.12) — also the
+     canonical "body" token's 16/24 spec below. */
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Modern display face for headings / wordmark. */
+/* Modern display face for headings / wordmark. Bare-tag default only — the
+   explicit .text-h1/.text-h2 tokens below (higher specificity) move screen
+   titles and card/section headings onto the UI sans face instead, per
+   design.md §6.2: the display/editorial face is reserved for genuine
+   editorial/hero/milestone moments, not routine chrome. Components that
+   render a raw <h1>/<h2> with no scale class (e.g. milestone/celebration
+   screens) intentionally keep this default. */
 h1, h2, .font-display {
   font-family: var(--font-display);
   font-weight: 600;
@@ -226,48 +234,98 @@ h1, h2, .font-display {
 }
 
 /* ------------------------------------------------------------------ */
-/* Explicit type scale (stronger hierarchy, mobile readability pass).  */
-/* Same font families/colors as above — sizing + weight + line-height  */
-/* + tracking only. Class specificity beats the bare h1/h2 rule above. */
+/* Canonical mobile type scale (design.md §6.2). Class specificity beats  */
+/* the bare h1/h2 rule above.                                            */
 /* ------------------------------------------------------------------ */
 
-/* Primary screen title. The one true "H1" per screen (design.md §6.2 h1,
-   pushed slightly larger/bolder for on-glance confidence during a shift). */
-.text-h1 {
+/* Hero/editorial moments only — lesson intros, milestones, brand storytelling.
+   Everything else uses the UI sans tokens below, even for "headings". */
+.text-display {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.01em;
-  font-size: 27px;
-  line-height: 35px;
+  font-size: 32px;
+  line-height: 38px;
+}
+
+/* Primary screen title. The one true "H1" per screen — UI sans, not the
+   editorial display face (screen titles are chrome, not a hero moment). */
+.text-h1 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-size: 24px;
+  line-height: 30px;
 }
 
 /* Section / card / content title — one tier below the screen title. */
 .text-h2 {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-weight: 600;
   letter-spacing: -0.01em;
-  font-size: 21px;
+  font-size: 20px;
   line-height: 28px;
 }
 
-/* Eyebrow / category label ("TODAY", "FOUNDATIONS", "CONCEPT"): quiet but
-   legible — medium weight and real letter-spacing carry it, not faintness. */
+/* Default reading copy. */
+.text-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+/* Supporting information — one tier quieter than body. */
+.text-small {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+/* Form labels and general UI labels. Plain — no uppercase/tracking, so an
+   actual <label for="..."> reads as a normal word ("Work email"), not
+   shouted caps. Category/eyebrow tags use .text-eyebrow instead. */
 .text-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--text-secondary);
+}
+
+/* Category/eyebrow tag ("TODAY", "FOUNDATIONS", "CONCEPT") — quiet but
+   legible; medium weight + real letter-spacing carry it, not faintness.
+   Moved off monospace onto the UI sans face (design.md: tags/chips are a
+   Nexa-Text-family role, not "technical content"). */
+.text-eyebrow {
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 12px;
+  line-height: 16px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-secondary);
 }
 
-/* Quiet utility layer: step counts, minute estimates, timestamps. Never the
-   only carrier of an instruction — always paired with a visible primary CTA. */
+/* Compact metadata: step counts, minute estimates, timestamps, stats. Never
+   the only carrier of an instruction — always paired with a visible primary
+   CTA. Moved off monospace — mono is reserved for genuinely technical
+   content (prompts, code, structured technical values), not metadata. */
 .text-meta {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-weight: 500;
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 16px;
   color: var(--text-secondary);
+}
+
+/* Bottom navigation labels. */
+.text-nav {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
 }
 
 /* Card/section entry — animate transform + opacity only (§6.6) */

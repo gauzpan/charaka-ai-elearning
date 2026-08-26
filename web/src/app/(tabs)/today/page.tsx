@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import type { SVGProps } from "react";
 import { Card } from "@/components/ui/Card";
@@ -12,6 +13,7 @@ import { useProgress } from "@/lib/useProgress";
 import { getLesson, allTryItCards } from "@/content/modules";
 import { AiFeedRail } from "@/components/today/AiFeedRail";
 import { todaysPhilosophyQuote } from "@/content/philosophyQuotes";
+import { trackTodayTabViewed } from "@/lib/analyticsClient";
 
 // Today: the default landing — exactly one next action (design.md §4.1),
 // composed as a scene: dominant focal card → supporting modules → progress
@@ -21,6 +23,14 @@ export default function TodayPage() {
   const next = nextLesson();
   const practiceTask = allTryItCards()[0];
   const quote = todaysPhilosophyQuote();
+
+  useEffect(() => {
+    if (!ready) return;
+    trackTodayTabViewed(level.name, skillPoints);
+    // Fire once per mount, once the real level/points are known — not on
+    // every points/level change within the same visit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
   // All lessons done — quiet, honest empty-ish state.
   if (ready && !next) {

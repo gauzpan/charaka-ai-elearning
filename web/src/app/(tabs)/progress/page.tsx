@@ -55,7 +55,7 @@ export default function ProgressPage() {
               strokeWidth={5}
               label="Level progress"
             >
-              <span className="font-mono text-[11px] font-semibold text-secondary">
+              <span className="font-sans text-[11px] font-semibold text-secondary">
                 {skillPoints}
               </span>
             </ProgressRing>

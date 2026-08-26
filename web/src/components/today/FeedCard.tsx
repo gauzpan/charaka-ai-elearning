@@ -6,6 +6,7 @@ import { Tag } from "@/components/ui/Tag";
 import { timeAgo } from "@/lib/timeAgo";
 import { CATEGORY_TONE, type FeedCategory } from "@/lib/feedSources";
 import { FeedFallbackArt } from "@/components/feed/FeedFallbackArt";
+import { trackAiFeedClicked } from "@/lib/analyticsClient";
 
 // A premium editorial carousel card for Today's AI Feed panel — deliberately
 // not the same component as the full Resources -> AI Feed list rows
@@ -36,6 +37,7 @@ export function FeedCard({ item, featured }: { item: FeedCardItem; featured: boo
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackAiFeedClicked(item.title)}
       className={cn(
         "group flex shrink-0 snap-start flex-col overflow-hidden bg-surface transition-[transform,box-shadow] duration-200 ease-out",
         "active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",

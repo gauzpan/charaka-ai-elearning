@@ -9,6 +9,7 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { buttonClasses } from "@/components/ui/Button";
 import { useProgress } from "@/lib/useProgress";
 import { shareUrl, shareText, linkedInHref, xHref } from "@/lib/share";
+import { trackLessonShareClicked } from "@/lib/analyticsClient";
 import { cn } from "@/lib/cn";
 
 // The reward beat after a lesson (design.md §5.1 "end on a reward"). Shows the
@@ -44,11 +45,13 @@ export function LessonComplete({
   const canNativeShare =
     typeof navigator !== "undefined" && typeof navigator.share === "function";
 
-  function openShare(href: string) {
+  function openShare(platform: string, href: string) {
+    trackLessonShareClicked(platform, lesson.id);
     window.open(href, "_blank", "noopener,noreferrer");
   }
 
   async function nativeShare() {
+    trackLessonShareClicked("native", lesson.id);
     const url = shareUrl("app");
     try {
       // Prefer sharing the summary image itself where the platform allows it.
@@ -147,14 +150,14 @@ export function LessonComplete({
             </div>
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => openShare(linkedInHref(shareUrl("linkedin")))}
+                onClick={() => openShare("linkedin", linkedInHref(shareUrl("linkedin")))}
                 className={buttonClasses("ghost", "w-full justify-start gap-3")}
               >
                 <LinkedInIcon />
                 Share on LinkedIn
               </button>
               <button
-                onClick={() => openShare(xHref(text, shareUrl("x")))}
+                onClick={() => openShare("x", xHref(text, shareUrl("x")))}
                 className={buttonClasses("ghost", "w-full justify-start gap-3")}
               >
                 <XIcon />

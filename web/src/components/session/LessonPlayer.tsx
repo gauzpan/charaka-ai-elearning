@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Lesson, Module } from "@/content/types";
 import { CardView } from "./CardView";
@@ -9,6 +9,7 @@ import { StepBar } from "@/components/ui/StepBar";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { buttonClasses } from "@/components/ui/Button";
 import { useProgress, POINTS_PER_LESSON } from "@/lib/useProgress";
+import { trackLessonCardViewed } from "@/lib/analyticsClient";
 import { cn } from "@/lib/cn";
 
 // Linear session runner (design.md §4.2, §5.1). Owns the full screen: no tab
@@ -36,6 +37,19 @@ export function LessonPlayer({ module, lesson }: { module: Module; lesson: Lesso
   const isLast = current === total - 1;
   const minsLeft = Math.max(1, Math.round((lesson.minutes * (total - current)) / total));
 
+  // Session-local wall-clock start, purely for the first_lesson_completed
+  // analytics event's time_taken_seconds — never persisted to Progress.
+  // Set in an effect (not during render) since Date.now() is impure.
+  const startedAtRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    startedAtRef.current ??= Date.now();
+  }, []);
+
+  useEffect(() => {
+    trackLessonCardViewed(lesson.id);
+  }, [current, lesson.id]);
+
   if (awarded !== null) {
     return <LessonComplete module={module} lesson={lesson} pointsAwarded={awarded} />;
   }
@@ -43,7 +57,8 @@ export function LessonPlayer({ module, lesson }: { module: Module; lesson: Lesso
   function goNext() {
     if (isLast) {
       const firstCompletion = !isCompleted(lesson.id);
-      completeLesson(lesson.id);
+      const timeTakenSeconds = Math.round((Date.now() - (startedAtRef.current ?? Date.now())) / 1000);
+      completeLesson(lesson.id, timeTakenSeconds);
       // Show the completion + share screen instead of routing straight out.
       setAwarded(firstCompletion ? POINTS_PER_LESSON : 0);
       return;
@@ -78,7 +93,7 @@ export function LessonPlayer({ module, lesson }: { module: Module; lesson: Lesso
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </button>
-          <span className="truncate font-mono text-[12px] font-medium text-secondary">
+          <span className="truncate font-sans text-[12px] font-medium text-secondary">
             {lesson.title}
           </span>
           <span className="w-9" />

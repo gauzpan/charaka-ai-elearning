@@ -7,5 +7,5 @@ import type { ReactNode } from "react";
  * (design.md §6.2 Labels): quiet, but never faint enough to read as disabled.
  */
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
-  return <p className={cn("text-label", className)}>{children}</p>;
+  return <p className={cn("text-eyebrow", className)}>{children}</p>;
 }

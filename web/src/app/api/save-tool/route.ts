@@ -2,6 +2,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getUserIdOrNull } from "@/lib/auth";
 import { TOOLS } from "@/content/toolkit";
+import { trackToolkitToolBookmarked } from "@/lib/analytics";
 
 // Saved tools: a per-user bookmark of an AI Toolkit tool (Resources).
 // Mirrors save-prompt/route.ts. Content is TS, so we validate toolId against
@@ -41,12 +42,28 @@ export async function POST(req: Request) {
   if (!userId) return Response.json({ error: "unauthenticated" }, { status: 401 });
 
   const { toolId } = parsed.data;
+  const alreadySaved = await prisma.savedTool.findUnique({
+    where: { userId_toolId: { userId, toolId } },
+  });
   // Idempotent: unique (userId, toolId) means a repeat save is a no-op.
   await prisma.savedTool.upsert({
     where: { userId_toolId: { userId, toolId } },
     create: { userId, toolId },
     update: {},
   });
+
+  if (!alreadySaved) {
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    const tool = TOOLS.find((t) => t.id === toolId);
+    trackToolkitToolBookmarked({
+      userId,
+      userAgent: req.headers.get("user-agent"),
+      userRole: user?.role,
+      toolId,
+      toolCategory: tool?.category ?? "unknown",
+    });
+  }
+
   return Response.json({ saved: true }, { status: 201 });
 }
 

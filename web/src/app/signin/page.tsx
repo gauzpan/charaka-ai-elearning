@@ -6,6 +6,7 @@ import { Button, buttonClasses } from "@/components/ui/Button";
 import { AppBackground } from "@/components/bg/AppBackground";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { trackAuthGoogleRequested } from "@/lib/analyticsClient";
 
 export default function SignInPage() {
   return (
@@ -82,6 +83,7 @@ function SignInContent() {
   }
 
   function continueWithGoogle() {
+    trackAuthGoogleRequested();
     setRedirecting(true);
     window.location.href = "/api/auth/google/start";
   }
@@ -209,7 +211,7 @@ function SignInContent() {
                     setStep("email");
                     setError(null);
                   }}
-                  className="font-mono text-[14px] font-medium text-secondary hover:text-primary"
+                  className="font-sans text-[14px] font-medium text-secondary hover:text-primary"
                 >
                   Use a different email
                 </button>
@@ -217,7 +219,7 @@ function SignInContent() {
                   type="button"
                   onClick={() => requestCode()}
                   disabled={sending}
-                  className="font-mono text-[14px] font-medium text-secondary hover:text-primary disabled:opacity-50"
+                  className="font-sans text-[14px] font-medium text-secondary hover:text-primary disabled:opacity-50"
                 >
                   Resend code
                 </button>

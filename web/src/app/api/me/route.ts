@@ -11,13 +11,14 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, email: true },
+    select: { id: true, email: true, role: true },
   });
   if (!user) return Response.json({ user: null }, { status: 200 });
 
   return Response.json({
     id: user.id,
     email: user.email,
+    role: user.role,
     initials: initialsFromEmail(user.email),
   });
 }
