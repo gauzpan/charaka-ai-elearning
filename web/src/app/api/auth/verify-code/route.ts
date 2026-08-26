@@ -69,8 +69,12 @@ export async function POST(req: Request) {
     data: { consumedAt: new Date() },
   });
 
+  // Set on every login, not just new accounts — otherwise anyone who signed
+  // in before Mixpanel was wired up (or on any return visit) would never get
+  // their email captured in their Mixpanel profile. people.set() is
+  // idempotent, so re-sending the same value on every login is harmless.
+  setProfile(user.id, { $email: user.email, platform: "web" });
   if (isNewAccount) {
-    setProfile(user.id, { $email: user.email, platform: "web" });
     track(user.id, "account_created", { platform: "web", sign_up_method: "email_code" });
   }
 

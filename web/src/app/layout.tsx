@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { MixpanelClientInit } from "@/components/analytics/MixpanelClientInit";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -78,6 +79,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full">
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <ServiceWorkerRegister />
+        <MixpanelClientInit />
         {children}
       </body>
     </html>

@@ -10,6 +10,7 @@ import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { useProgress, LEVELS } from "@/lib/useProgress";
 import { allLessons } from "@/content/modules";
+import { mixpanel } from "@/lib/mixpanelClient";
 
 const nextLevelName = (min: number) =>
   LEVELS.find((l) => l.min === min)?.name ?? "the next level";
@@ -85,7 +86,15 @@ export default function ProgressPage() {
         </>
       )}
 
-      <form action="/api/auth/signout" method="post" className="mt-2">
+      {/* mixpanel.reset() is synchronous/local (clears localStorage identity)
+          — safe to fire on submit without blocking the native form POST that
+          actually clears the session cookie server-side. */}
+      <form
+        action="/api/auth/signout"
+        method="post"
+        className="mt-2"
+        onSubmit={() => mixpanel.reset()}
+      >
         <button type="submit" className={buttonClasses("ghost", "w-full")}>
           Sign out
         </button>

@@ -20,6 +20,7 @@
     "@prisma/client": "^6.19.3",
     "fast-xml-parser": "^5.11.0",
     "mixpanel": "^0.23.0",
+    "mixpanel-browser": "^2.82.1",
     "next": "16.3.2",
     "openai": "^7.5.0",
     "prisma": "^6.19.3",
