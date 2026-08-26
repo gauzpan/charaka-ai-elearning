@@ -56,3 +56,63 @@ export function isAiRelevant(title: string, description: string): boolean {
 export function isPaywalled(title: string): boolean {
   return /^stat\+/i.test(title.trim());
 }
+
+// Topic taxonomy for the Today carousel's category pill. Deterministic
+// keyword matching, not an LLM guess — every category assignment is
+// reviewable from the rule that produced it, so the pill never presents an
+// invented judgment about a real article. Order matters: first match wins,
+// most specific rules first, "AI in Healthcare" is the honest fallback for
+// anything that doesn't hit a more specific bucket (this is still literally
+// true of every item in the feed, since isAiRelevant already gated it).
+export const FEED_CATEGORIES = [
+  "Research & Evidence",
+  "Policy & Regulation",
+  "Diagnostics & Imaging",
+  "Clinical Documentation",
+  "Patient Experience",
+  "Clinical Practice",
+  "Health IT & Operations",
+  "AI in Healthcare",
+] as const;
+export type FeedCategory = (typeof FEED_CATEGORIES)[number];
+
+const CATEGORY_RULES: [FeedCategory, RegExp][] = [
+  ["Research & Evidence", /\bresearch\b|\bstudy\b|\bstudies\b|\btrial\b|\bevidence\b|\bpaper\b|\bjournal\b|publication/i],
+  ["Policy & Regulation", /\bfda\b|regulat|\bpolicy\b|compliance|lawsuit|\blaw\b|congress/i],
+  ["Diagnostics & Imaging", /diagnos|imaging|radiolog|\bscan\b|screening/i],
+  ["Clinical Documentation", /documentation|charting|\bnote\b|\bnotes\b|\behr\b|\bemr\b|ambient|transcri/i],
+  ["Patient Experience", /patient experience|patient communication|\bportal\b|patient engagement/i],
+  ["Clinical Practice", /autonomy|\bclinician\b|\bclinicians\b|workforce|burnout|\bethic/i],
+  ["Health IT & Operations", /infrastructure|cybersecurity|\bsoc\b|\bsecurity\b|interoperab|workflow|operations|revenue cycle|\bclaims\b|prior authorization|outsourc/i],
+];
+
+/** Deterministic topic classification for the category pill. Checks the
+ * title alone first — a passing mention in the description (e.g. "Epic now
+ * connects with medical imaging, analytics, AI...") shouldn't outrank what
+ * the headline itself says the article is actually about. Only falls back
+ * to title+description if nothing in the title matches. */
+export function categoryFor(title: string, description: string): FeedCategory {
+  for (const [category, pattern] of CATEGORY_RULES) {
+    if (pattern.test(title)) return category;
+  }
+  const combined = `${title} ${description}`;
+  for (const [category, pattern] of CATEGORY_RULES) {
+    if (pattern.test(combined)) return category;
+  }
+  return "AI in Healthcare";
+}
+
+/** Category -> semantic Tag tone (design.md §7: color is scarce, meaning
+ * -only). Several categories share a tone deliberately — the pill's text is
+ * what differentiates categories, tone is just a coarse family grouping. No
+ * category maps to "error" since none represent something wrong. */
+export const CATEGORY_TONE: Record<FeedCategory, "info" | "success" | "warning" | "neutral"> = {
+  "Research & Evidence": "info",
+  "Policy & Regulation": "warning",
+  "Diagnostics & Imaging": "success",
+  "Clinical Documentation": "success",
+  "Patient Experience": "info",
+  "Clinical Practice": "neutral",
+  "Health IT & Operations": "neutral",
+  "AI in Healthcare": "neutral",
+};

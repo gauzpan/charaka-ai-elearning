@@ -7,6 +7,7 @@ import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { buttonClasses } from "@/components/ui/Button";
 import { FeedThumbnail } from "@/components/feed/FeedThumbnail";
+import type { FeedCategory } from "@/lib/feedSources";
 
 // AI Feed: the FeedItem cache the weekly Vercel Cron job (see vercel.json ->
 // api/feed/refresh) keeps stocked with up to FEED_SIZE items. This page only
@@ -58,7 +59,7 @@ export default async function FeedPage() {
               className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action rounded-lg"
             >
               <Card hover className="flex items-center gap-4">
-                <FeedThumbnail src={item.thumbnailUrl} />
+                <FeedThumbnail src={item.thumbnailUrl} category={item.category as FeedCategory} id={item.id} />
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <h3 className="line-clamp-2 font-medium text-[16px] leading-[21px] text-primary">
                     {item.title}

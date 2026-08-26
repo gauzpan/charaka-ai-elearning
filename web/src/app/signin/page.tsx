@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { AppBackground } from "@/components/bg/AppBackground";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 export default function SignInPage() {
   return (
@@ -64,15 +65,20 @@ function SignInContent() {
       if (!res.ok) {
         setError("That code is wrong or expired. Try again or resend.");
         setCode("");
+        setVerifying(false);
         return;
       }
+      // Leave `verifying` true (and the full-screen loader up) through the
+      // redirect itself — this page unmounts once the next route resolves,
+      // so clearing it here would just flash the form back for an instant.
       router.push(data.redirect);
     } catch {
       setError("Something went wrong. Try again.");
-    } finally {
       setVerifying(false);
     }
   }
+
+  if (verifying) return <PageLoader />;
 
   return (
     <>

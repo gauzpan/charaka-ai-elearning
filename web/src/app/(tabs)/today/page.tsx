@@ -10,6 +10,8 @@ import { ProgressRing } from "@/components/ui/ProgressRing";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { useProgress } from "@/lib/useProgress";
 import { getLesson, allTryItCards } from "@/content/modules";
+import { AiFeedRail } from "@/components/today/AiFeedRail";
+import { todaysPhilosophyQuote } from "@/content/philosophyQuotes";
 
 // Today: the default landing — exactly one next action (design.md §4.1),
 // composed as a scene: dominant focal card → supporting modules → progress
@@ -18,6 +20,7 @@ export default function TodayPage() {
   const { ready, nextLesson, cardIndexOf, skillPoints, level } = useProgress();
   const next = nextLesson();
   const practiceTask = allTryItCards()[0];
+  const quote = todaysPhilosophyQuote();
 
   // All lessons done — quiet, honest empty-ish state.
   if (ready && !next) {
@@ -36,6 +39,10 @@ export default function TodayPage() {
             Go to Journey
           </Link>
         </Card>
+        <AiFeedRail />
+        <p className="text-center text-meta">
+          &ldquo;{quote.text}&rdquo; &mdash; {quote.author}
+        </p>
       </div>
     );
   }
@@ -133,8 +140,10 @@ export default function TodayPage() {
         )}
       </div>
 
+      <AiFeedRail />
+
       <p className="text-center text-meta">
-        You can use what you learn today in your next note.
+        &ldquo;{quote.text}&rdquo; &mdash; {quote.author}
       </p>
     </div>
   );

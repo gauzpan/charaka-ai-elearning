@@ -1,7 +1,7 @@
 import "server-only";
 import { XMLParser } from "fast-xml-parser";
 import { prisma } from "@/lib/prisma";
-import { FEED_SOURCES, isAiRelevant, isPaywalled, type FeedSource } from "@/lib/feedSources";
+import { FEED_SOURCES, isAiRelevant, isPaywalled, categoryFor, type FeedSource, type FeedCategory } from "@/lib/feedSources";
 
 // AI Feed refresh (Resources -> AI Feed): fetches a curated RSS source list,
 // keyword-filters to AI/GenAI/prompting coverage, dedupes, ranks by recency,
@@ -20,6 +20,7 @@ interface RawFeedItem {
   description: string;
   thumbnailUrl: string | null;
   sourceName: string;
+  category: FeedCategory;
   publishedAt: Date;
 }
 
@@ -112,12 +113,14 @@ async function fetchSource(source: FeedSource): Promise<RawFeedItem[]> {
     const publishedAt = rawPubDate ? new Date(rawPubDate) : new Date();
     if (Number.isNaN(publishedAt.getTime())) continue;
 
+    const trimmedDescription = description.slice(0, MAX_DESCRIPTION_LENGTH);
     out.push({
       url: canonicalizeUrl(rawLink),
       title: title.slice(0, MAX_TITLE_LENGTH),
-      description: description.slice(0, MAX_DESCRIPTION_LENGTH),
+      description: trimmedDescription,
       thumbnailUrl: extractThumbnailUrl(item) ?? embeddedImageUrl,
       sourceName: source.name,
+      category: categoryFor(title, trimmedDescription),
       publishedAt,
     });
   }

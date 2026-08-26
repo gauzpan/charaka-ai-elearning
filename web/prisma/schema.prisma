@@ -106,6 +106,12 @@ model FeedItem {
   description  String
   thumbnailUrl String?
   sourceName   String
+  // Deterministic, keyword-classified topic (see categoryFor() in
+  // lib/feedSources.ts) — not AI-guessed, so it's reviewable and never
+  // presents a fabricated judgment about a real article. Default is a
+  // migration-safety fallback for rows that predate this column; every row
+  // written by refreshFeed() gets a real computed value.
+  category     String   @default("AI in Healthcare")
   publishedAt  DateTime
   fetchedAt    DateTime @default(now())
 
