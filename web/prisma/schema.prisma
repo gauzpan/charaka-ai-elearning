@@ -91,6 +91,27 @@ model SavedPrompt {
   @@index([userId])
 }
 
+// Weekly-refreshed cache of AI-in-healthcare news (Resources -> AI Feed),
+// fetched server-side from a curated RSS source list. A deliberate exception
+// to the "content is TS, not DB" rule above: unlike static lessons/toolkit
+// entries, this content changes over time and needs caching across requests.
+// Refreshed by the Vercel Cron job in vercel.json hitting /api/feed/refresh,
+// which replaces the full set each run — this table always holds exactly
+// "this week's 10" (or fewer, if a week is genuinely thin on real coverage;
+// never padded with fabricated items).
+model FeedItem {
+  id           String   @id @default(cuid())
+  url          String   @unique
+  title        String
+  description  String
+  thumbnailUrl String?
+  sourceName   String
+  publishedAt  DateTime
+  fetchedAt    DateTime @default(now())
+
+  @@index([publishedAt])
+}
+
 // A tool the user bookmarked from the AI Toolkit (Resources). toolId is the
 // content slug from src/content/toolkit.ts (content is TS, not DB rows).
 model SavedTool {
