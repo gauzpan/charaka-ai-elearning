@@ -91,24 +91,27 @@ function SignInContent() {
   return (
     <>
       <AppBackground />
-      <main className="mx-auto flex min-h-dvh max-w-[440px] flex-col items-center justify-center gap-8 px-5 py-10">
-        <div className="flex flex-col items-center gap-3 text-center">
+      <main className="mx-auto flex min-h-dvh max-w-[440px] flex-col items-center justify-center gap-[clamp(1rem,3dvh,2rem)] overflow-y-auto px-5 py-[clamp(0.75rem,3dvh,2.5rem)]">
+        {/* Logo/name/tagline scale with viewport height (clamp on dvh) so the
+            active step's controls stay on screen down to ~668px tall, while
+            still filling out proportionally on taller viewports. */}
+        <div className="flex flex-col items-center gap-[clamp(0.375rem,1dvh,0.75rem)] text-center">
           <img
             src="/app-logo.webp"
             alt=""
             aria-hidden
-            className="h-28 w-28 shrink-0 object-contain"
+            className="h-[clamp(40px,8dvh,112px)] w-[clamp(40px,8dvh,112px)] shrink-0 object-contain"
           />
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-primary">
+          <h1 className="font-display text-[clamp(1.25rem,3.2dvh,2.25rem)] leading-tight font-semibold tracking-tight text-primary">
             Charaka AI
           </h1>
-          <p className="max-w-[320px] text-[16px] leading-[25px] text-secondary">
+          <p className="max-w-[320px] text-[clamp(0.8125rem,1.8dvh,1rem)] leading-[1.4] text-secondary">
             Clinical intelligence, built for your next round.
           </p>
         </div>
 
         {step === "email" ? (
-          <>
+          <div className="flex w-full flex-col gap-[clamp(0.75rem,2dvh,1.25rem)]">
             <div className="flex w-full flex-col gap-1.5">
               <h2 className="text-h2 text-primary">Sign in</h2>
               <p className="text-[15px] leading-[23px] text-secondary">
@@ -142,7 +145,7 @@ function SignInContent() {
               </Button>
             </form>
 
-            <div className="flex w-full items-center gap-3 py-1" aria-hidden>
+            <div className="flex w-full items-center gap-3" aria-hidden>
               <div className="h-px flex-1 bg-[var(--border)]" />
               <span className="text-meta text-muted">or</span>
               <div className="h-px flex-1 bg-[var(--border)]" />
@@ -158,9 +161,9 @@ function SignInContent() {
             </button>
 
             {error && <p className="text-[15px] leading-[22px] text-error">{error}</p>}
-          </>
+          </div>
         ) : (
-          <>
+          <div className="flex w-full flex-col gap-[clamp(0.75rem,2dvh,1.25rem)]">
             <div className="flex w-full flex-col gap-1.5">
               <h2 className="text-h2 text-primary">Enter your code</h2>
               <p className="text-[15px] leading-[23px] text-secondary">
@@ -220,7 +223,7 @@ function SignInContent() {
                 </button>
               </div>
             </form>
-          </>
+          </div>
         )}
       </main>
     </>
