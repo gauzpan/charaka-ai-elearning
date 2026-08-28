@@ -62,11 +62,19 @@ export function trackUserSignedIn(p: StandardParams & { method: "email_code" | "
 }
 
 export function trackOnboardingCompleted(
-  p: StandardParams & { focusTaskSelected: string; studyWindowTime: string },
+  p: StandardParams & {
+    focusTaskSelected: string;
+    studyWindowTime: string;
+    /** True when the user picked "Other" and typed their own answer rather
+     *  than one of the four preset focus tasks — lets you see how often the
+     *  presets miss without parsing free text. */
+    usedOtherOption: boolean;
+  },
 ) {
   fire(p, "onboarding_completed", {
     focus_task_selected: p.focusTaskSelected,
     study_window_time: p.studyWindowTime,
+    used_other_option: p.usedOtherOption,
   });
 }
 

@@ -18,6 +18,7 @@ const TASKS = [
   { id: "communication", label: "Patient communication" },
   { id: "documentation", label: "Documentation & notes" },
   { id: "admin", label: "Admin & coordination" },
+  { id: "other", label: "Other" },
 ];
 
 const WINDOWS: { id: "commute" | "break" | "evening"; label: string }[] = [
@@ -32,6 +33,7 @@ export function OnboardingFlow() {
   const router = useRouter();
   const [step, setStep] = useState(0); // 0 task, 1 window, 2 done
   const [task, setTask] = useState<string | null>(null);
+  const [otherTask, setOtherTask] = useState("");
   const [win, setWin] = useState<"commute" | "break" | "evening" | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -45,12 +47,15 @@ export function OnboardingFlow() {
 
   async function finish(nextWin: "commute" | "break" | "evening") {
     setSaving(true);
-    const focusTask = TASKS.find((t) => t.id === task)?.label ?? "Research & evidence synthesis";
+    const focusTask =
+      task === "other"
+        ? otherTask.trim()
+        : (TASKS.find((t) => t.id === task)?.label ?? "Research & evidence synthesis");
     try {
       await fetch("/api/onboarding", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ focusTask, studyWindow: nextWin }),
+        body: JSON.stringify({ focusTask, studyWindow: nextWin, isCustomFocusTask: task === "other" }),
       });
     } catch {
       // proceed anyway — onboarding is best-effort; they can still use the app
@@ -81,7 +86,22 @@ export function OnboardingFlow() {
               />
             ))}
           </div>
-          <Button className="w-full" disabled={!task} onClick={() => setStep(1)}>
+          {task === "other" && (
+            <input
+              type="text"
+              autoFocus
+              value={otherTask}
+              onChange={(e) => setOtherTask(e.target.value)}
+              placeholder="What do you want to get better at?"
+              maxLength={80}
+              className="h-12 w-full rounded-sm border bg-surface px-4 text-base text-primary outline-none focus-visible:border-strong focus-visible:ring-2 focus-visible:ring-action"
+            />
+          )}
+          <Button
+            className="w-full"
+            disabled={!task || (task === "other" && !otherTask.trim())}
+            onClick={() => setStep(1)}
+          >
             Continue
           </Button>
         </div>

@@ -19,6 +19,17 @@ import mixpanel from "mixpanel-browser";
 
 let initialized = false;
 
+// The mixpanel-browser singleton only sets up its internal state (hooks,
+// persistence, config, etc.) inside .init() — calling .track()/.identify()/
+// .register()/.reset() on it before that (e.g. NEXT_PUBLIC_MIXPANEL_TOKEN
+// unset in this environment) throws deep inside the library's internals
+// ("Cannot read properties of undefined (reading 'before_track')"), which
+// can crash the whole page since it's an uncaught error inside a render-path
+// effect. Every call site must check this first.
+export function isMixpanelClientReady(): boolean {
+  return initialized;
+}
+
 export function initMixpanelClient(): void {
   if (initialized) return;
   const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;

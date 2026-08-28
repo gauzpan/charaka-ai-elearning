@@ -1,6 +1,6 @@
 "use client";
 
-import { mixpanel } from "@/lib/mixpanelClient";
+import { mixpanel, isMixpanelClientReady } from "@/lib/mixpanelClient";
 import { deviceTypeFromUA } from "@/lib/analyticsShared";
 
 // Centralized, type-safe client-side event helpers — the browser-SDK
@@ -20,7 +20,7 @@ let superPropsRegistered = false;
 
 /** Called once by MixpanelClientInit after identify() resolves. */
 export function registerAnalyticsSuperProps(userRole: string | null): void {
-  if (superPropsRegistered) return;
+  if (superPropsRegistered || !isMixpanelClientReady()) return;
   superPropsRegistered = true;
   mixpanel.register({
     userRole: userRole ?? "unknown",
@@ -29,6 +29,7 @@ export function registerAnalyticsSuperProps(userRole: string | null): void {
 }
 
 function fire(event: string, payload: Record<string, string | number | boolean> = {}): void {
+  if (!isMixpanelClientReady()) return; // e.g. NEXT_PUBLIC_MIXPANEL_TOKEN unset in this env
   mixpanel.track(event, { ...payload, timestamp: new Date().toISOString() });
 }
 

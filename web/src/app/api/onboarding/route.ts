@@ -8,6 +8,9 @@ export const runtime = "nodejs";
 const Body = z.object({
   focusTask: z.string().min(1).max(80),
   studyWindow: z.enum(["commute", "break", "evening"]),
+  // Client is the source of truth for this — it's the one that knows
+  // whether "Other" was picked, regardless of what text ended up in it.
+  isCustomFocusTask: z.boolean().optional(),
 });
 
 export async function POST(req: Request) {
@@ -38,6 +41,7 @@ export async function POST(req: Request) {
     userRole: user.role,
     focusTaskSelected: parsed.data.focusTask,
     studyWindowTime: parsed.data.studyWindow,
+    usedOtherOption: parsed.data.isCustomFocusTask ?? false,
   });
 
   return Response.json({ ok: true });

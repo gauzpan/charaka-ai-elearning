@@ -10,7 +10,7 @@ import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { useProgress, LEVELS } from "@/lib/useProgress";
 import { allLessons } from "@/content/modules";
-import { mixpanel } from "@/lib/mixpanelClient";
+import { mixpanel, isMixpanelClientReady } from "@/lib/mixpanelClient";
 
 const nextLevelName = (min: number) =>
   LEVELS.find((l) => l.min === min)?.name ?? "the next level";
@@ -93,7 +93,7 @@ export default function ProgressPage() {
         action="/api/auth/signout"
         method="post"
         className="mt-2"
-        onSubmit={() => mixpanel.reset()}
+        onSubmit={() => isMixpanelClientReady() && mixpanel.reset()}
       >
         <button type="submit" className={buttonClasses("ghost", "w-full")}>
           Sign out

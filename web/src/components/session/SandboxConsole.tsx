@@ -38,11 +38,18 @@ export function SandboxConsole({ card }: { card: TryItCard }) {
     setResult("");
     setNotice(null);
     setErrorMsg("");
+    // Belt-and-suspenders alongside the server's own OpenRouter timeout: even
+    // if the server response is somehow never delivered (a proxy/edge issue,
+    // not just a slow model), this keeps the UI from spinning forever with
+    // no way out.
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 35_000);
     try {
       const res = await fetch("/api/practice", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ taskId: card.taskId, prompt }),
+        signal: controller.signal,
       });
       const data = await res.json();
       if (!res.ok) {
@@ -53,9 +60,15 @@ export function SandboxConsole({ card }: { card: TryItCard }) {
       setResult(data.output ?? "");
       setNotice(data.notice ?? null);
       setStatus("done");
-    } catch {
-      setErrorMsg("Network error — check your connection and retry.");
+    } catch (err) {
+      setErrorMsg(
+        err instanceof DOMException && err.name === "AbortError"
+          ? "This is taking too long. Try again."
+          : "Network error — check your connection and retry.",
+      );
       setStatus("error");
+    } finally {
+      clearTimeout(timeout);
     }
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { initMixpanelClient, mixpanel } from "@/lib/mixpanelClient";
+import { initMixpanelClient, isMixpanelClientReady, mixpanel } from "@/lib/mixpanelClient";
 import { registerAnalyticsSuperProps } from "@/lib/analyticsClient";
 
 // Mounted once in the root layout, mirrors ServiceWorkerRegister's pattern:
@@ -18,7 +18,7 @@ export function MixpanelClientInit() {
     fetch("/api/me")
       .then((r) => r.json())
       .then((data: { id?: string; role?: string }) => {
-        if (cancelled || !data.id) return;
+        if (cancelled || !data.id || !isMixpanelClientReady()) return;
         mixpanel.identify(data.id);
         registerAnalyticsSuperProps(data.role ?? null);
       })
